@@ -113,7 +113,7 @@
   border: none;
   border-radius: 8px;
 
-  background-color: #0c067d;
+  background-color: #3f3a97;
   color: white;
 
   font-size: 15px;
@@ -125,7 +125,7 @@
 }
 
 .add-student-btn:hover {
-  background-color: #3730a3;
+  background-color: #3c34d0;
   transform: translateY(-2px);
 }
 .students-header {
@@ -142,7 +142,7 @@
 
 .students-header p {
   margin: 0;
-  color: #6b7280;
+  color: #3871e3;
 }
 
 .student-filters {
@@ -155,7 +155,7 @@
   padding: 20px;
   border-radius: 12px;
 
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 10px rgba(0, 29, 86, 0.884);
 }
 
 .student-filters input,
@@ -175,8 +175,8 @@
 
 .student-filters input:focus,
 .student-filters select:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  border-color: #0a047b;
+  box-shadow: 0 0 0 3px rgba(76, 69, 174, 0.637);
 }
 
 .student-count {
@@ -191,7 +191,7 @@
   background-color: white;
   border-radius: 12px;
 
-  color: #6b7280;
+  color: #0a3282;
 }
 
 .no-students h3 {

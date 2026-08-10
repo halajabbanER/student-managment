@@ -182,25 +182,25 @@
 }
 
 .student-form-page button[type="submit"] {
-  background-color: #4f46e5;
+  background-color: #0d0780;
   color: white;
 
   margin-right: 10px;
 }
 
 .student-form-page button[type="submit"]:hover {
-  background-color: #3730a3;
+  background-color: #01c0ef;
 
   transform: translateY(-2px);
 }
 
 .student-form-page button[type="button"] {
-  background-color: #e5e7eb;
-  color: #374151;
+  background-color: #0d0780;
+  color: #fcfcfc;
 }
 
 .student-form-page button[type="button"]:hover {
-  background-color: #223654;
+  background-color: #00ccffab;
 }
 
 @media (max-width: 600px) {
