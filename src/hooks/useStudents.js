@@ -1,44 +1,12 @@
 import useLocalStorage from "./useLocalStorage";
 
 function useStudents() {
-  const [students, setStudents] = useLocalStorage("students", [
-    {
-      id: 1,
-      name: "Ali Ahmad",
-      email: "ali@gmail.com",
-      department: "Computer Engineering",
-      level: "3rd Year",
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Sara Omar",
-      email: "sara@gmail.com",
-      department: "Software Engineering",
-      level: "2nd Year",
-      status: "Active",
-    },
-    {
-      id: 3,
-      name: "Lina Hasan",
-      email: "lina@gmail.com",
-      department: "Computer Engineering",
-      level: "4th Year",
-      status: "Graduated",
-    },
-    {
-      id: 4,
-      name: "Omar Khaled",
-      email: "omar@gmail.com",
-      department: "Electrical Engineering",
-      level: "1st Year",
-      status: "Inactive",
-    },
-  ]);
+  const [students, setStudents] = useLocalStorage("students", []);
 
   const addStudent = (newStudent) => {
     const student = {
       id: Date.now(),
+      courses: [],
       ...newStudent,
     };
 
@@ -46,13 +14,13 @@ function useStudents() {
   };
 
   const deleteStudent = (id) => {
-    setStudents(students.filter((student) => student.id !== id));
+    setStudents(students.filter((student) => student.id !== Number(id)));
   };
 
   const updateStudent = (id, updatedData) => {
     setStudents(
       students.map((student) =>
-        student.id === id ? { ...student, ...updatedData } : student,
+        student.id === Number(id) ? { ...student, ...updatedData } : student,
       ),
     );
   };
@@ -61,12 +29,72 @@ function useStudents() {
     return students.find((student) => student.id === Number(id));
   };
 
+  // Add Course
+  const addCourse = (studentId, courseData) => {
+    setStudents(
+      students.map((student) =>
+        student.id === Number(studentId)
+          ? {
+              ...student,
+              courses: [
+                ...(student.courses || []),
+                {
+                  id: Date.now(),
+                  ...courseData,
+                },
+              ],
+            }
+          : student,
+      ),
+    );
+  };
+
+  // Update Course Grade
+  const updateCourseGrade = (studentId, courseId, newGrade) => {
+    setStudents(
+      students.map((student) =>
+        student.id === Number(studentId)
+          ? {
+              ...student,
+              courses: (student.courses || []).map((course) =>
+                course.id === courseId
+                  ? {
+                      ...course,
+                      grade: Number(newGrade),
+                    }
+                  : course,
+              ),
+            }
+          : student,
+      ),
+    );
+  };
+
+  // Delete Course
+  const deleteCourse = (studentId, courseId) => {
+    setStudents(
+      students.map((student) =>
+        student.id === Number(studentId)
+          ? {
+              ...student,
+              courses: (student.courses || []).filter(
+                (course) => course.id !== courseId,
+              ),
+            }
+          : student,
+      ),
+    );
+  };
+
   return {
     students,
     addStudent,
     deleteStudent,
     updateStudent,
     getStudent,
+    addCourse,
+    updateCourseGrade,
+    deleteCourse,
   };
 }
 

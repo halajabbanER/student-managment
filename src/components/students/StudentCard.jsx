@@ -2,6 +2,14 @@ import { useNavigate } from "react-router-dom";
 
 function StudentCard({ student, onDelete }) {
   const navigate = useNavigate();
+  const courses = student.courses || [];
+  const average =
+    courses.length > 0
+      ? (
+          courses.reduce((total, course) => total + Number(course.grade), 0) /
+          courses.length
+        ).toFixed(2)
+      : "0.00";
 
   return (
     <div className="student-card">
@@ -17,6 +25,9 @@ function StudentCard({ student, onDelete }) {
 
       <p>
         <strong>Status:</strong> {student.status}
+      </p>
+      <p>
+        <strong>Average:</strong> {average}
       </p>
 
       <div className="student-actions">
