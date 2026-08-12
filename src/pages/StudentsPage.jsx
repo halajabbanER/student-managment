@@ -1,39 +1,53 @@
 import { useMemo, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 
 import StudentCard from "../components/students/StudentCard";
-import useStudents from "../hooks/useStudents";
 import StudentFilter from "../components/students/StudentFilter";
+import LoadingSpinner from "../common/LoadingSpinner";
+import ErrorMessage from "../common/ErrorMessage";
+
+import useStudents from "../hooks/useStudents";
 
 import "./StudentsPage.css";
-//component
+
 function StudentsPage() {
   const navigate = useNavigate();
 
-  const { students, deleteStudent } = useStudents();
+  const { students, loading, error, deleteStudent, refetchStudents } =
+    useStudents();
 
   const [searchTerm, setSearchTerm] = useState("");
+
   const [departmentFilter, setDepartmentFilter] = useState("All");
+
   const [statusFilter, setStatusFilter] = useState("All");
+
   const [levelFilter, setLevelFilter] = useState("All");
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this student?",
     );
 
-    if (confirmDelete) {
-      deleteStudent(id);
+    if (!confirmDelete) {
+      return;
+    }
+
+    const result = await deleteStudent(id);
+
+    if (!result.success) {
+      alert(result.message);
     }
   };
-  //search
+
   const filteredStudents = useMemo(() => {
     return students.filter((student) => {
       const search = searchTerm.toLowerCase();
 
       const matchesSearch =
-        student.name.toLowerCase().includes(search) ||
-        student.email.toLowerCase().includes(search) ||
+        student.name?.toLowerCase().includes(search) ||
+        student.email?.toLowerCase().includes(search) ||
         String(student.id).includes(search);
 
       const matchesDepartment =
@@ -51,11 +65,20 @@ function StudentsPage() {
     });
   }, [students, searchTerm, departmentFilter, statusFilter, levelFilter]);
 
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <ErrorMessage message={error} onRetry={refetchStudents} />;
+  }
+
   return (
     <div className="students-page">
       <div className="students-header">
         <div>
           <h1>Students</h1>
+
           <p>Manage and search student records.</p>
         </div>
 
@@ -95,6 +118,7 @@ function StudentsPage() {
       ) : (
         <div className="no-students">
           <h3>No students found</h3>
+
           <p>Try changing your search or filters.</p>
         </div>
       )}

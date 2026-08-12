@@ -6,7 +6,7 @@ import "./StudentFormPage.css";
 function AddStudentPage() {
   const navigate = useNavigate();
 
-  const { addStudent } = useStudents();
+  const { addStudent, loading } = useStudents();
 
   // Student form data
   const [formData, setFormData] = useState({
@@ -73,7 +73,7 @@ function AddStudentPage() {
   };
 
   // Submit form
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     // Stop if validation fails
@@ -81,7 +81,7 @@ function AddStudentPage() {
       return;
     }
 
-    addStudent(formData);
+    await addStudent(formData);
 
     alert("Student added successfully!");
 
@@ -178,8 +178,8 @@ function AddStudentPage() {
 
         {/* Buttons */}
         <div className="form-buttons">
-          <button type="submit" className="save-btn">
-            Add Student
+          <button type="submit" className="save-btn" disabled={loading}>
+            {loading ? "Saving..." : "Add Student"}
           </button>
 
           <button

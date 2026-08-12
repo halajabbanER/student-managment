@@ -88,6 +88,16 @@
   transform: translateY(-2px);
 }
 
+.save-btn:disabled,
+.save-btn:disabled:hover {
+  background-color: #9ca3af;
+  color: #f9fafb;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.85;
+}
+
 .cancel-btn {
   background-color: #6b7280;
 }

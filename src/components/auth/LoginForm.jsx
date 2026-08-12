@@ -1,69 +1,77 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import useAuth from "../../hooks/useAuth";
+import useForm from "../../hooks/useForm";
+
 import "./Auth.css";
 
 function LoginPage() {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
+  const { login } = useAuth();
+
+  const { values, handleChange, resetForm } = useForm({
     email: "",
     password: "",
   });
 
   const [errors, setErrors] = useState({});
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
+  const validateForm = () => {
+    const newErrors = {};
 
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    setErrors({
-      ...errors,
+    if (!values.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(values.email)) {
+      newErrors.email = "Please enter a valid email";
+    }
+
+    if (!values.password) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (event) => {
+    handleChange(event);
+
+    const { name } = event.target;
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
       [name]: "",
-    });
+      general: "",
+    }));
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    const newErrors = {};
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+    if (!validateForm()) {
       return;
     }
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const result = login(values.email, values.password);
 
-    const user = users.find(
-      (user) =>
-        user.email === formData.email && user.password === formData.password,
-    );
-
-    if (!user) {
+    if (!result.success) {
       setErrors({
-        general: "Invalid email or password",
+        general: result.message,
       });
 
       return;
     }
 
-    localStorage.setItem("currentUser", JSON.stringify(user));
+    resetForm();
 
-    alert("Login successful!");
-
-    navigate("/home");
+    navigate("/", {
+      replace: true,
+    });
   };
 
   return (
@@ -83,8 +91,8 @@ function LoginPage() {
               type="email"
               name="email"
               placeholder="example@gmail.com"
-              value={formData.email}
-              onChange={handleChange}
+              value={values.email}
+              onChange={handleInputChange}
             />
 
             {errors.email && <p className="error-message">{errors.email}</p>}
@@ -97,8 +105,8 @@ function LoginPage() {
               type="password"
               name="password"
               placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleChange}
+              value={values.password}
+              onChange={handleInputChange}
             />
 
             {errors.password && (

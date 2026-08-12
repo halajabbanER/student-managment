@@ -1,11 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import useAuth from "../../hooks/useAuth";
+import useForm from "../../hooks/useForm";
+
 import "./Auth.css";
 
 function RegisterPage() {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
+  const { register } = useAuth();
+
+  const { values, handleChange, resetForm } = useForm({
     name: "",
     email: "",
     password: "",
@@ -14,20 +20,6 @@ function RegisterPage() {
 
   const [errors, setErrors] = useState({});
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-
-    setErrors({
-      ...errors,
-      [name]: "",
-    });
-  };
-
   const validateForm = () => {
     const newErrors = {};
 
@@ -35,34 +27,49 @@ function RegisterPage() {
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
-    if (!formData.name.trim()) {
+    // Name
+    if (!values.name.trim()) {
       newErrors.name = "Full name is required";
-    } else if (formData.name.trim().length < 3) {
+    } else if (values.name.trim().length < 3) {
       newErrors.name = "Name must be at least 3 characters";
     }
 
-    if (!formData.email.trim()) {
+    // Email
+    if (!values.email.trim()) {
       newErrors.email = "Email is required";
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Invalid email address";
+    } else if (!emailRegex.test(values.email)) {
+      newErrors.email = "Please enter a valid email";
     }
 
-    if (!formData.password) {
+    // Password
+    if (!values.password) {
       newErrors.password = "Password is required";
-    } else if (!passwordRegex.test(formData.password)) {
+    } else if (!passwordRegex.test(values.password)) {
       newErrors.password =
-        "Password must contain 8 characters, uppercase, lowercase and number";
+        "Password must contain at least 8 characters, uppercase, lowercase and a number";
     }
 
-    if (!formData.confirmPassword) {
+    // Confirm Password
+    if (!values.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password";
-    } else if (formData.password !== formData.confirmPassword) {
+    } else if (values.password !== values.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
     setErrors(newErrors);
 
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (event) => {
+    handleChange(event);
+
+    const { name } = event.target;
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
   };
 
   const handleSubmit = (event) => {
@@ -72,29 +79,23 @@ function RegisterPage() {
       return;
     }
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const result = register({
+      name: values.name.trim(),
+      email: values.email.trim(),
+      password: values.password,
+    });
 
-    const existingUser = users.find((user) => user.email === formData.email);
-
-    if (existingUser) {
+    if (!result.success) {
       setErrors({
-        ...errors,
-        email: "This email is already registered",
+        email: result.message,
       });
 
       return;
     }
 
-    const newUser = {
-      id: Date.now(),
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-    };
-
-    localStorage.setItem("users", JSON.stringify([...users, newUser]));
-
     alert("Account created successfully!");
+
+    resetForm();
 
     navigate("/login");
   };
@@ -107,6 +108,7 @@ function RegisterPage() {
         <p className="auth-subtitle">Create your account to manage students.</p>
 
         <form onSubmit={handleSubmit}>
+          {/* Full Name */}
           <div className="form-group">
             <label>Full Name</label>
 
@@ -114,13 +116,14 @@ function RegisterPage() {
               type="text"
               name="name"
               placeholder="Enter your full name"
-              value={formData.name}
-              onChange={handleChange}
+              value={values.name}
+              onChange={handleInputChange}
             />
 
             {errors.name && <p className="error-message">{errors.name}</p>}
           </div>
 
+          {/* Email */}
           <div className="form-group">
             <label>Email</label>
 
@@ -128,13 +131,14 @@ function RegisterPage() {
               type="email"
               name="email"
               placeholder="example@gmail.com"
-              value={formData.email}
-              onChange={handleChange}
+              value={values.email}
+              onChange={handleInputChange}
             />
 
             {errors.email && <p className="error-message">{errors.email}</p>}
           </div>
 
+          {/* Password */}
           <div className="form-group">
             <label>Password</label>
 
@@ -142,8 +146,8 @@ function RegisterPage() {
               type="password"
               name="password"
               placeholder="Enter password"
-              value={formData.password}
-              onChange={handleChange}
+              value={values.password}
+              onChange={handleInputChange}
             />
 
             {errors.password && (
@@ -151,6 +155,7 @@ function RegisterPage() {
             )}
           </div>
 
+          {/* Confirm Password */}
           <div className="form-group">
             <label>Confirm Password</label>
 
@@ -158,8 +163,8 @@ function RegisterPage() {
               type="password"
               name="confirmPassword"
               placeholder="Confirm password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
+              value={values.confirmPassword}
+              onChange={handleInputChange}
             />
 
             {errors.confirmPassword && (

@@ -8,15 +8,22 @@ function useLocalStorage(key, initialValue) {
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       console.error("LocalStorage Error:", error);
+
       return initialValue;
     }
   });
 
   const setValue = (value) => {
     try {
-      setStoredValue(value);
+      // يدعم القيمة العادية أو function
+      setStoredValue((prevValue) => {
+        const valueToStore =
+          value instanceof Function ? value(prevValue) : value;
 
-      localStorage.setItem(key, JSON.stringify(value));
+        localStorage.setItem(key, JSON.stringify(valueToStore));
+
+        return valueToStore;
+      });
     } catch (error) {
       console.error("LocalStorage Error:", error);
     }

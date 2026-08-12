@@ -20,13 +20,15 @@ function StudentDetailsPage() {
       <div className="student-details-page">
         <h2>Student not found</h2>
 
-        <button onClick={() => navigate("/students")}>Back to Students</button>
+        <button type="button" onClick={() => navigate("/students")}>
+          Back to Students
+        </button>
       </div>
     );
   }
 
   const courses = student.courses || [];
-
+  const statusClass = (student.status || "").toLowerCase();
   const average =
     courses.length > 0
       ? (
@@ -47,12 +49,33 @@ function StudentDetailsPage() {
     }
 
     addCourse(student.id, {
-      name: courseName,
+      name: courseName.trim(),
       grade: Number(grade),
     });
 
     setCourseName("");
     setGrade("");
+  };
+
+  const handleEditGrade = (course) => {
+    const newGrade = prompt("Enter new grade:", course.grade);
+
+    if (
+      newGrade !== null &&
+      newGrade !== "" &&
+      Number(newGrade) >= 0 &&
+      Number(newGrade) <= 100
+    ) {
+      updateCourseGrade(student.id, course.id, newGrade);
+    }
+  };
+
+  const handleDeleteCourse = (courseId) => {
+    const confirmDelete = window.confirm("Delete this course?");
+
+    if (confirmDelete) {
+      deleteCourse(student.id, courseId);
+    }
   };
 
   return (
@@ -84,7 +107,7 @@ function StudentDetailsPage() {
 
         <div className="student-info">
           <strong>Status:</strong>
-          <span className={`student-status ${student.status.toLowerCase()}`}>
+          <span className={`student-status ${statusClass}`}>
             {student.status}
           </span>
         </div>
@@ -96,9 +119,12 @@ function StudentDetailsPage() {
 
         <div className="courses-section">
           <div className="courses-header">
-            <h2>Courses</h2>
+            <div>
+              <h2>Courses</h2>
+              <p>Manage student courses and grades.</p>
+            </div>
 
-            <span>Average: {average}</span>
+            <span className="average-badge">Average: {average} / 100</span>
           </div>
 
           <div className="add-course-form">
@@ -106,7 +132,7 @@ function StudentDetailsPage() {
               type="text"
               placeholder="Course name"
               value={courseName}
-              onChange={(event) => setCourseName(event.target.value)}
+              onChange={(e) => setCourseName(e.target.value)}
             />
 
             <input
@@ -115,71 +141,103 @@ function StudentDetailsPage() {
               min="0"
               max="100"
               value={grade}
-              onChange={(event) => setGrade(event.target.value)}
+              onChange={(e) => setGrade(e.target.value)}
             />
 
-            <button type="button" onClick={handleAddCourse}>
-              + Add Course
-            </button>
+            <button onClick={handleAddCourse}>+ Add Course</button>
           </div>
 
-          {courses.length > 0 ? (
-            <div className="course-list">
-              {courses.map((course) => (
-                <div className="course-item" key={course.id}>
-                  <div>
-                    <h3>{course.name}</h3>
-                    <span>Grade: {course.grade}</span>
-                  </div>
+          {student.courses && student.courses.length > 0 ? (
+            <div className="courses-table-wrapper">
+              <table className="courses-table">
+                <thead>
+                  <tr>
+                    <th>Course</th>
+                    <th>Grade</th>
+                    <th>Result</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
 
-                  <div className="course-actions">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const newGrade = prompt(
-                          "Enter new grade:",
-                          course.grade,
-                        );
+                <tbody>
+                  {student.courses.map((course) => (
+                    <tr key={course.id}>
+                      <td>{course.name}</td>
 
-                        if (
-                          newGrade !== null &&
-                          newGrade !== "" &&
-                          Number(newGrade) >= 0 &&
-                          Number(newGrade) <= 100
-                        ) {
-                          updateCourseGrade(student.id, course.id, newGrade);
-                        }
-                      }}
-                    >
-                      Edit Grade
-                    </button>
+                      <td>
+                        <span className="grade-badge">{course.grade}</span>
+                      </td>
 
-                    <button
-                      type="button"
-                      className="course-delete-btn"
-                      onClick={() => {
-                        const confirmDelete = window.confirm(
-                          "Delete this course?",
-                        );
+                      <td>
+                        <span
+                          className={
+                            Number(course.grade) >= 50
+                              ? "result passed"
+                              : "result failed"
+                          }
+                        >
+                          {Number(course.grade) >= 50 ? "Passed" : "Failed"}
+                        </span>
+                      </td>
 
-                        if (confirmDelete) {
-                          deleteCourse(student.id, course.id);
-                        }
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
+                      <td>
+                        <div className="course-actions">
+                          <button
+                            className="edit-grade-btn"
+                            onClick={() => {
+                              const newGrade = prompt(
+                                "Enter new grade:",
+                                course.grade,
+                              );
+
+                              if (
+                                newGrade !== null &&
+                                newGrade !== "" &&
+                                Number(newGrade) >= 0 &&
+                                Number(newGrade) <= 100
+                              ) {
+                                updateCourseGrade(
+                                  student.id,
+                                  course.id,
+                                  newGrade,
+                                );
+                              }
+                            }}
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            className="delete-course-btn"
+                            onClick={() => {
+                              const confirmDelete = window.confirm(
+                                "Are you sure you want to delete this course?",
+                              );
+
+                              if (confirmDelete) {
+                                deleteCourse(student.id, course.id);
+                              }
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           ) : (
-            <p className="no-courses">No courses added yet.</p>
+            <div className="no-courses">
+              <p>No courses added yet.</p>
+            </div>
           )}
         </div>
 
         <div className="details-buttons">
           <button
+            type="button"
             className="edit-student-btn"
             onClick={() => navigate(`/student/edit/${student.id}`)}
           >
@@ -187,6 +245,7 @@ function StudentDetailsPage() {
           </button>
 
           <button
+            type="button"
             className="back-students-btn"
             onClick={() => navigate("/students")}
           >

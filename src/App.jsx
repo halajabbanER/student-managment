@@ -1,10 +1,11 @@
-import { Navigate, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import HomePage from "./pages/HomePage";
 import StudentsPage from "./pages/StudentsPage";
 import StudentDetailsPage from "./pages/StudentDetailsPage";
 import StudentFormPage from "./pages/StudentFormPage";
 import AddStudentPage from "./pages/AddStudentPage";
+
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -15,12 +16,14 @@ import MainLayout from "./components/common/MainLayout";
 function App() {
   return (
     <Routes>
-      {/* Public Pages */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      {/* Public Routes */}
+
       <Route path="/login" element={<LoginPage />} />
+
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* Protected Pages */}
+      {/* Protected Routes */}
+
       <Route
         element={
           <PrivateRoute>
@@ -28,7 +31,7 @@ function App() {
           </PrivateRoute>
         }
       >
-        <Route path="/home" element={<HomePage />} />
+        <Route path="/" element={<HomePage />} />
 
         <Route path="/students" element={<StudentsPage />} />
 
@@ -39,7 +42,6 @@ function App() {
         <Route path="/student/edit/:id" element={<StudentFormPage />} />
       </Route>
 
-      {/* 404 */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
