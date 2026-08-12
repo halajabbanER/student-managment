@@ -111,62 +111,97 @@
     margin-left: auto;
   }
 }
-
-
 /* =========================
-   Mobile
+   Mobile Header
 ========================= */
 
-@media (max-width: 650px) {
+@media (max-width: 768px) {
   .main-header {
-    padding: 14px 16px;
+    width: 100%;
+    padding: 15px;
 
     display: flex;
     flex-direction: column;
-
     align-items: stretch;
 
-    gap: 14px;
+    gap: 15px;
 
-    overflow: visible;
+    box-sizing: border-box;
+
+    overflow: hidden;
   }
 
   /* Logo */
   .header-logo {
+    width: 100%;
+
     text-align: center;
 
-    font-size: 18px;
+    font-size: 20px;
+
+    white-space: normal;
   }
 
   /* Navigation */
   .header-nav {
     width: 100%;
 
-    margin-left: 0;
+    margin: 0;
 
     display: flex;
+    align-items: center;
     justify-content: center;
 
-    gap: 12px;
+    gap: 8px;
   }
 
   .header-nav a {
     flex: 1;
 
-    padding: 9px;
+    padding: 10px 6px;
 
     text-align: center;
 
-    border-radius: 7px;
+    font-size: 14px;
 
     background: #f3f4f6;
 
-    font-size: 14px;
+    border-radius: 8px;
   }
 
-  .header-nav a:hover {
-    background: #eef2ff;
+  /* User section */
+  .header-user {
+    width: 100%;
+
+    margin: 0;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 10px;
   }
+
+  .header-user span {
+    flex: 1;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-user button {
+    flex-shrink: 0;
+
+    padding: 10px 16px;
+
+    min-height: 44px;
+
+    font-size: 14px;
+  }
+}
 
   /* User + Logout */
   .header-user {
@@ -199,4 +234,3 @@
 
     flex-shrink: 0;
   }
-}
