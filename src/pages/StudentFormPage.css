@@ -233,3 +233,10 @@
 
 
 }
+.save-btn:disabled,
+.cancel-btn:disabled,
+.form-group input:disabled,
+.form-group select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

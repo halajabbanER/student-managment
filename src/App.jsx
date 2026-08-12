@@ -41,7 +41,10 @@ function App() {
 
         <Route path="/student/edit/:id" element={<StudentFormPage />} />
       </Route>
-
+<Route
+  path="*"
+  element={<NotFoundPage />}
+/>
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

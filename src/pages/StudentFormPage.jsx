@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import useStudents from "../hooks/useStudents";
-import "./StudentFormPage.css";
 
+import useStudents from "../hooks/useStudents";
+
+import "./StudentFormPage.css";
 
 function StudentFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { getStudent, updateStudent } = useStudents();
+  const { getStudent, updateStudent, loading } = useStudents();
 
   const currentStudent = getStudent(id);
 
@@ -20,12 +21,16 @@ function StudentFormPage() {
     status: currentStudent?.status || "",
   });
 
+  const [errors, setErrors] = useState({});
+
   if (!currentStudent) {
     return (
-      <div>
+      <div className="student-form-page">
         <h2>Student not found</h2>
 
-        <button onClick={() => navigate("/students")}>Back to Students</button>
+        <button className="cancel-btn" onClick={() => navigate("/students")}>
+          Back to Students
+        </button>
       </div>
     );
   }
@@ -33,16 +38,70 @@ function StudentFormPage() {
   const handleChange = (event) => {
     const { name, value } = event.target;
 
-    setFormData({
-      ...formData,
+    setFormData((prevData) => ({
+      ...prevData,
       [name]: value,
-    });
+    }));
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
   };
 
-  const handleSubmit = (event) => {
+  const validateForm = () => {
+    const newErrors = {};
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Full name is required";
+    } else if (formData.name.trim().length < 3) {
+      newErrors.name = "Name must be at least 3 characters";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Please enter a valid email";
+    }
+
+    if (!formData.department) {
+      newErrors.department = "Department is required";
+    }
+
+    if (!formData.level) {
+      newErrors.level = "Academic level is required";
+    }
+
+    if (!formData.status) {
+      newErrors.status = "Status is required";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    updateStudent(Number(id), formData);
+    if (!validateForm()) {
+      return;
+    }
+
+    const result = await updateStudent(Number(id), {
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      department: formData.department,
+      level: formData.level,
+      status: formData.status,
+    });
+
+    if (!result.success) {
+      alert(result.message);
+      return;
+    }
 
     alert("Student updated successfully!");
 
@@ -54,66 +113,125 @@ function StudentFormPage() {
       <h1>Edit Student</h1>
 
       <form onSubmit={handleSubmit}>
-        <div>
+        {/* Full Name */}
+        <div className="form-group">
           <label>Full Name</label>
 
           <input
             type="text"
             name="name"
+            placeholder="Enter full name"
             value={formData.name}
             onChange={handleChange}
+            disabled={loading}
           />
+
+          {errors.name && <p className="error-message">{errors.name}</p>}
         </div>
 
-        <div>
+        {/* Email */}
+        <div className="form-group">
           <label>Email</label>
 
           <input
             type="email"
             name="email"
+            placeholder="example@gmail.com"
             value={formData.email}
             onChange={handleChange}
+            disabled={loading}
           />
+
+          {errors.email && <p className="error-message">{errors.email}</p>}
         </div>
 
-        <div>
+        {/* Department */}
+        <div className="form-group">
           <label>Department</label>
 
-          <input
-            type="text"
+          <select
             name="department"
             value={formData.department}
             onChange={handleChange}
-          />
+            disabled={loading}
+          >
+            <option value="">Select Department</option>
+
+            <option value="Computer Engineering">Computer Engineering</option>
+
+            <option value="Software Engineering">Software Engineering</option>
+
+            <option value="Electrical Engineering">
+              Electrical Engineering
+            </option>
+
+            <option value="Civil Engineering">Civil Engineering</option>
+          </select>
+
+          {errors.department && (
+            <p className="error-message">{errors.department}</p>
+          )}
         </div>
 
-        <div>
+        {/* Level */}
+        <div className="form-group">
           <label>Academic Level</label>
 
-          <select name="level" value={formData.level} onChange={handleChange}>
+          <select
+            name="level"
+            value={formData.level}
+            onChange={handleChange}
+            disabled={loading}
+          >
             <option value="">Select Level</option>
+
             <option value="1st Year">1st Year</option>
+
             <option value="2nd Year">2nd Year</option>
+
             <option value="3rd Year">3rd Year</option>
+
             <option value="4th Year">4th Year</option>
           </select>
+
+          {errors.level && <p className="error-message">{errors.level}</p>}
         </div>
 
-        <div>
+        {/* Status */}
+        <div className="form-group">
           <label>Status</label>
 
-          <select name="status" value={formData.status} onChange={handleChange}>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            disabled={loading}
+          >
             <option value="Active">Active</option>
+
             <option value="Inactive">Inactive</option>
+
             <option value="Graduated">Graduated</option>
           </select>
+
+          {errors.status && <p className="error-message">{errors.status}</p>}
         </div>
 
-        <button type="submit">Save Changes</button>
+        {/* Buttons */}
+        <div className="form-buttons">
+          <button type="submit" className="save-btn" disabled={loading}>
+            {loading ? "Saving..." : "Save Changes"}
+          </button>
 
-        <button type="button" onClick={() => navigate("/students")}>
-          Cancel
-        </button>
+          <button
+            type="button"
+            className="cancel-btn"
+            onClick={() => navigate("/students")}
+            disabled={loading}
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );

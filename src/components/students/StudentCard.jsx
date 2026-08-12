@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-
+import { memo } from "react";
 function StudentCard({ student, onDelete }) {
   const navigate = useNavigate();
   const courses = student.courses || [];
@@ -56,4 +56,4 @@ function StudentCard({ student, onDelete }) {
   );
 }
 
-export default StudentCard;
+export default memo(StudentCard);
