@@ -2,9 +2,11 @@ html,
 body,
 #root {
   width: 100%;
-  max-width: 100%;
+  min-height: 100%;
+
   margin: 0;
   padding: 0;
+
   overflow-x: hidden;
 }
 
@@ -12,6 +14,130 @@ body,
   box-sizing: border-box;
 }
 
-img {
-  max-width: 100%;
+body {
+  margin: 0;
+
+  background: #f3f4f6;
+  color: #1f2937;
+
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* =========================
+   Dark Mode Global
+========================= */
+
+body.dark-mode {
+  background: #111827;
+  color: #f9fafb;
+}
+
+/* Pages */
+
+body.dark-mode .home-page,
+body.dark-mode .students-page,
+body.dark-mode .student-details-page,
+body.dark-mode .student-form-page {
+  background: #111827;
+}
+
+/* Cards */
+
+body.dark-mode .stat-card,
+body.dark-mode .student-card,
+body.dark-mode .student-details-card,
+body.dark-mode .student-filters,
+body.dark-mode .student-form-page form,
+body.dark-mode .quick-card,
+body.dark-mode .summary-card,
+body.dark-mode .no-students,
+body.dark-mode .courses-table,
+body.dark-mode .error-container {
+  background: #1f2937;
+
+  color: #f9fafb;
+
+  border-color: #374151;
+}
+
+/* Text */
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode strong,
+body.dark-mode label {
+  color: #f9fafb;
+}
+
+body.dark-mode p {
+  color: #cbd5e1;
+}
+
+/* Inputs */
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background: #111827;
+
+  color: #f9fafb;
+
+  border-color: #4b5563;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #9ca3af;
+}
+
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus {
+  border-color: #818cf8;
+
+  box-shadow:
+    0 0 0 3px rgba(129, 140, 248, 0.15);
+}
+
+/* Student information */
+
+body.dark-mode .student-info {
+  border-bottom-color: #374151;
+
+  color: #d1d5db;
+}
+
+/* Table */
+
+body.dark-mode .courses-table th {
+  background: #111827;
+
+  color: #d1d5db;
+}
+
+body.dark-mode .courses-table td {
+  border-top-color: #374151;
+
+  color: #e5e7eb;
+}
+
+body.dark-mode .courses-table tbody tr:hover {
+  background: #374151;
+}
+
+/* Filters */
+
+body.dark-mode .student-count {
+  color: #9ca3af;
+}
+
+/* Footer if used */
+
+body.dark-mode footer {
+  background: #1f2937;
+
+  color: #d1d5db;
 }

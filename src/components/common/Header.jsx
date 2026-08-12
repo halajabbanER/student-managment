@@ -1,5 +1,8 @@
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import useAuth from "../../hooks/useAuth";
+
 import "./Header.css";
 
 function Header() {
@@ -7,10 +10,32 @@ function Header() {
 
   const { user, logout } = useAuth();
 
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem("theme") === "dark";
+  });
+
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+  }, [darkMode]);
+
+  const toggleTheme = () => {
+    const newDarkMode = !darkMode;
+
+    setDarkMode(newDarkMode);
+
+    localStorage.setItem("theme", newDarkMode ? "dark" : "light");
+  };
+
   const handleLogout = () => {
     logout();
 
-    navigate("/login");
+    navigate("/login", {
+      replace: true,
+    });
   };
 
   return (
@@ -20,19 +45,30 @@ function Header() {
       </Link>
 
       <nav className="header-nav">
-        <Link to="/home">Dashboard</Link>
+        <Link to="/">Dashboard</Link>
+
         <Link to="/students">Students</Link>
       </nav>
 
       <div className="header-user">
         {user && (
-          <>
-            <span>
-              Welcome, <strong>{user.name}</strong>
-            </span>
+          <span>
+            Welcome, <strong>{user.name}</strong>
+          </span>
+        )}
 
-            <button onClick={handleLogout}>Logout</button>
-          </>
+        <button
+          className="theme-btn"
+          onClick={toggleTheme}
+          title={darkMode ? "Light Mode" : "Dark Mode"}
+        >
+          {darkMode ? "☀️" : "🌙"}
+        </button>
+
+        {user && (
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
         )}
       </div>
     </header>
