@@ -85,6 +85,14 @@ function AuthProvider({ children }) {
           );
         }
 
+        // Teacher
+        if (item.role === "teacher") {
+          return (
+            String(item.teacherId) === String(identifier) &&
+            item.password === password
+          );
+        }
+
         return false;
       });
 
@@ -180,6 +188,72 @@ function AuthProvider({ children }) {
     }
   };
 
+  // Teacher Register
+  const registerTeacher = (userData) => {
+    try {
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      const teachers = JSON.parse(localStorage.getItem("teachers")) || [];
+
+      const teacherExists = teachers.find(
+        (teacher) => String(teacher.teacherId) === String(userData.teacherId),
+      );
+
+      if (!teacherExists) {
+        return {
+          success: false,
+          message:
+            "Teacher ID not found. Please contact Academic Administration.",
+        };
+      }
+
+      const existingUser = users.find(
+        (item) =>
+          item.role === "teacher" &&
+          String(item.teacherId) === String(userData.teacherId),
+      );
+
+      if (existingUser) {
+        return {
+          success: false,
+          message: "This Teacher ID is already registered",
+        };
+      }
+
+      const newUser = {
+        id: Date.now(),
+        name: teacherExists.name,
+        teacherId: teacherExists.teacherId,
+        password: userData.password,
+        role: "teacher",
+      };
+
+      localStorage.setItem("users", JSON.stringify([...users, newUser]));
+
+      const updatedTeachers = teachers.map((teacher) =>
+        String(teacher.teacherId) === String(userData.teacherId)
+          ? {
+              ...teacher,
+              accountCreated: true,
+            }
+          : teacher,
+      );
+
+      localStorage.setItem("teachers", JSON.stringify(updatedTeachers));
+
+      return {
+        success: true,
+        user: newUser,
+      };
+    } catch (error) {
+      console.error("Teacher Register Error:", error);
+
+      return {
+        success: false,
+        message: "Something went wrong",
+      };
+    }
+  };
+
   // Logout
   const logout = () => {
     setUser(null);
@@ -198,6 +272,7 @@ function AuthProvider({ children }) {
         user,
         login,
         register,
+        registerTeacher,
         logout,
         isAuthenticated,
         isAdmin,

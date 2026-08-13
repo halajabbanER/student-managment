@@ -3,26 +3,33 @@ import { Routes, Route } from "react-router-dom";
 /* Authentication */
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import TeacherRegisterPage from "./pages/TeacherRegisterPage";
+
 import AdminLoginPage from "./components/auth/AdminLoginPage";
 
-/* Admin Pages */
+/* Admin */
 import HomePage from "./pages/HomePage";
 import StudentsPage from "./pages/StudentsPage";
 import AddStudentPage from "./pages/AddStudentPage";
 import StudentDetailsPage from "./pages/StudentDetailsPage";
 import StudentFormPage from "./pages/StudentFormPage";
 
-/* Academic Pages */
+/* Academic */
 import AcademicDashboardPage from "./pages/AcademicDashboardPage";
 import AcademicStudentsPage from "./pages/AcademicStudentsPage";
 import AcademicTeachersPage from "./pages/AcademicTeachersPage";
+import AcademicDepartmentsPage from "./pages/AcademicDepartmentsPage";
+import AcademicCoursesPage from "./pages/AcademicCoursesPage";
+import CourseEnrollmentPage from "./pages/CourseEnrollmentPage";
 
 /* Student */
 import StudentPortalPage from "./pages/StudentPortalPage";
 
+/* Teacher */
+import TeacherPortalPage from "./pages/TeacherPortalPage";
+
 /* Other */
 import NotFoundPage from "./pages/NotFoundPage";
-import RolesHubPage from "./pages/RolesHubPage";
 
 /* Components */
 import MainLayout from "./components/common/MainLayout";
@@ -31,21 +38,17 @@ import RoleRoute from "./components/auth/RoleRoute";
 function App() {
   return (
     <Routes>
-      {/* =========================
-          Public Routes
-      ========================= */}
+      {/* PUBLIC */}
 
       <Route path="/login" element={<LoginPage />} />
 
       <Route path="/register" element={<RegisterPage />} />
 
+      <Route path="/teacher-register" element={<TeacherRegisterPage />} />
+
       <Route path="/admin-login" element={<AdminLoginPage />} />
 
-      <Route path="/roles" element={<RolesHubPage />} />
-
-      {/* =========================
-          Student Portal
-      ========================= */}
+      {/* STUDENT */}
 
       <Route
         path="/student-portal"
@@ -56,41 +59,18 @@ function App() {
         }
       />
 
-      {/* =========================
-          Shared Student Management
-          Admin + Academic
-      ========================= */}
+      {/* TEACHER */}
 
       <Route
-        path="/student/new"
+        path="/teacher-portal"
         element={
-          <RoleRoute allowedRoles={["admin", "academic"]}>
-            <AddStudentPage />
+          <RoleRoute allowedRoles={["teacher"]}>
+            <TeacherPortalPage />
           </RoleRoute>
         }
       />
 
-      <Route
-        path="/student/:id"
-        element={
-          <RoleRoute allowedRoles={["admin", "academic"]}>
-            <StudentDetailsPage />
-          </RoleRoute>
-        }
-      />
-
-      <Route
-        path="/student/edit/:id"
-        element={
-          <RoleRoute allowedRoles={["admin", "academic"]}>
-            <StudentFormPage />
-          </RoleRoute>
-        }
-      />
-
-      {/* =========================
-          Academic Routes
-      ========================= */}
+      {/* ACADEMIC */}
 
       <Route
         path="/academic"
@@ -119,9 +99,63 @@ function App() {
         }
       />
 
-      {/* =========================
-          Admin Routes
-      ========================= */}
+      <Route
+        path="/academic/departments"
+        element={
+          <RoleRoute allowedRoles={["academic"]}>
+            <AcademicDepartmentsPage />
+          </RoleRoute>
+        }
+      />
+
+      <Route
+        path="/academic/courses"
+        element={
+          <RoleRoute allowedRoles={["academic"]}>
+            <AcademicCoursesPage />
+          </RoleRoute>
+        }
+      />
+
+      <Route
+        path="/academic/courses/:id/enrollment"
+        element={
+          <RoleRoute allowedRoles={["academic"]}>
+            <CourseEnrollmentPage />
+          </RoleRoute>
+        }
+      />
+
+      {/* ADMIN + ACADEMIC */}
+
+      <Route
+        path="/student/new"
+        element={
+          <RoleRoute allowedRoles={["admin", "academic"]}>
+            <AddStudentPage />
+          </RoleRoute>
+        }
+      />
+
+      <Route
+        path="/student/:id"
+        element={
+          <RoleRoute allowedRoles={["admin", "academic"]}>
+            <StudentDetailsPage />
+          </RoleRoute>
+        }
+      />
+
+      <Route
+        path="/student/edit/:id"
+        element={
+          <RoleRoute allowedRoles={["admin", "academic"]}>
+            <StudentFormPage />
+          </RoleRoute>
+        }
+      />
+
+      {/* ADMIN */}
 
       <Route
         element={
@@ -135,9 +169,7 @@ function App() {
         <Route path="/students" element={<StudentsPage />} />
       </Route>
 
-      {/* =========================
-          404
-      ========================= */}
+      {/* 404 */}
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

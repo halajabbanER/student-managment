@@ -8,6 +8,7 @@ import "./Auth.css";
 
 function LoginPage() {
   const navigate = useNavigate();
+
   const { login } = useAuth();
 
   const { values, handleChange, resetForm } = useForm({
@@ -33,7 +34,7 @@ function LoginPage() {
     const newErrors = {};
 
     if (!values.identifier.trim()) {
-      newErrors.identifier = "Student ID or Academic Email is required";
+      newErrors.identifier = "University ID or Academic Email is required";
     }
 
     if (!values.password) {
@@ -64,6 +65,7 @@ function LoginPage() {
 
     resetForm();
 
+    // Student
     if (result.user.role === "student") {
       navigate("/student-portal", {
         replace: true,
@@ -72,6 +74,16 @@ function LoginPage() {
       return;
     }
 
+    // Teacher
+    if (result.user.role === "teacher") {
+      navigate("/teacher-portal", {
+        replace: true,
+      });
+
+      return;
+    }
+
+    // Academic
     if (result.user.role === "academic") {
       navigate("/academic", {
         replace: true,
@@ -80,30 +92,40 @@ function LoginPage() {
       return;
     }
 
+    // Admin
+    if (result.user.role === "admin") {
+      navigate("/", {
+        replace: true,
+      });
+
+      return;
+    }
+
     setErrors({
-      general: "Please use the Admin Login page.",
+      general: "Unknown account type",
     });
   };
 
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Student & Academic Login</h1>
+        <h1>University Login</h1>
 
         <p className="auth-subtitle">
-          Students use Student ID, academic staff use email.
+          Students and teachers use their university ID. Academic staff use
+          email.
         </p>
 
         {errors.general && <p className="login-error">{errors.general}</p>}
 
         <form onSubmit={handleSubmit} autoComplete="off">
           <div className="form-group">
-            <label>Student ID or Academic Email</label>
+            <label>Student ID / Teacher ID / Academic Email</label>
 
             <input
               type="text"
               name="identifier"
-              placeholder="Student ID or academic@email.com"
+              placeholder="Enter university ID or academic email"
               value={values.identifier}
               onChange={handleInputChange}
               autoComplete="off"
@@ -134,22 +156,8 @@ function LoginPage() {
           <button type="submit" className="auth-btn">
             Login
           </button>
+         
         </form>
-
-        <p className="auth-link">
-          Student without an account?{" "}
-          <span onClick={() => navigate("/register")}>Register</span>
-        </p>
-
-        <p className="auth-link">
-          Administrator?{" "}
-          <span onClick={() => navigate("/admin-login")}>Admin Login</span>
-        </p>
-
-        <p className="auth-link">
-          Roles ready to use?{" "}
-          <span onClick={() => navigate("/roles")}>Open Roles Hub</span>
-        </p>
       </div>
     </div>
   );

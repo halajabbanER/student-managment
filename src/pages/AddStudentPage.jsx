@@ -11,6 +11,8 @@ function AddStudentPage() {
   const { addStudent, loading } = useStudents();
 
   const [formData, setFormData] = useState({
+    studentId: "",
+    password: "",
     name: "",
     email: "",
     department: "",
@@ -31,6 +33,7 @@ function AddStudentPage() {
     setErrors((prevErrors) => ({
       ...prevErrors,
       [name]: "",
+      general: "",
     }));
   };
 
@@ -38,6 +41,16 @@ function AddStudentPage() {
     const newErrors = {};
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!formData.studentId.trim()) {
+      newErrors.studentId = "Student ID is required";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
 
     if (!formData.name.trim()) {
       newErrors.name = "Full name is required";
@@ -76,31 +89,101 @@ function AddStudentPage() {
     }
 
     const result = await addStudent({
+      studentId: formData.studentId.trim(),
+      password: formData.password,
+
       name: formData.name.trim(),
       email: formData.email.trim(),
+
       department: formData.department,
       level: formData.level,
       status: formData.status,
+
+      accountCreated: true,
+
+      courses: [],
+      exams: [],
+      schedule: [],
     });
 
     if (!result.success) {
-      alert(result.message);
+      setErrors({
+        general: result.message || "Failed to add student",
+      });
+
       return;
     }
 
-    alert("Student added successfully!");
+    alert(`Student added successfully!\nStudent ID: ${formData.studentId}`);
 
-    navigate("/students");
+    navigate("/academic/students");
   };
 
   return (
     <div className="student-form-page">
-      <h1>Add New Student</h1>
+      <div className="student-form-header">
+        <div>
+          <h1>Add New Student</h1>
 
-      <form onSubmit={handleSubmit}>
+          <p>Create student academic information and login credentials.</p>
+        </div>
+
+        <button
+          type="button"
+          className="cancel-btn"
+          onClick={() => navigate("/academic/students")}
+          disabled={loading}
+        >
+          ← Back
+        </button>
+      </div>
+
+      {errors.general && (
+        <div className="form-general-error">{errors.general}</div>
+      )}
+
+      <form onSubmit={handleSubmit} autoComplete="off">
+        {/* Student ID */}
+        <div className="form-group">
+          <label>Student ID *</label>
+
+          <input
+            type="text"
+            name="studentId"
+            placeholder="Example: 20260015"
+            value={formData.studentId}
+            onChange={handleChange}
+            autoComplete="off"
+            disabled={loading}
+          />
+
+          {errors.studentId && (
+            <p className="error-message">{errors.studentId}</p>
+          )}
+        </div>
+
+        {/* Password */}
+        <div className="form-group">
+          <label>Password *</label>
+
+          <input
+            type="password"
+            name="password"
+            placeholder="Create student password"
+            value={formData.password}
+            onChange={handleChange}
+            autoComplete="new-password"
+            disabled={loading}
+          />
+
+          {errors.password && (
+            <p className="error-message">{errors.password}</p>
+          )}
+        </div>
+
         {/* Full Name */}
         <div className="form-group">
-          <label>Full Name</label>
+          <label>Full Name *</label>
 
           <input
             type="text"
@@ -116,12 +199,12 @@ function AddStudentPage() {
 
         {/* Email */}
         <div className="form-group">
-          <label>Email</label>
+          <label>Email *</label>
 
           <input
             type="email"
             name="email"
-            placeholder="example@gmail.com"
+            placeholder="student@university.com"
             value={formData.email}
             onChange={handleChange}
             disabled={loading}
@@ -132,7 +215,7 @@ function AddStudentPage() {
 
         {/* Department */}
         <div className="form-group">
-          <label>Department</label>
+          <label>Department *</label>
 
           <select
             name="department"
@@ -160,7 +243,7 @@ function AddStudentPage() {
 
         {/* Academic Level */}
         <div className="form-group">
-          <label>Academic Level</label>
+          <label>Academic Level *</label>
 
           <select
             name="level"
@@ -182,9 +265,9 @@ function AddStudentPage() {
           {errors.level && <p className="error-message">{errors.level}</p>}
         </div>
 
-      
+        {/* Status */}
         <div className="form-group">
-          <label>Status</label>
+          <label>Status *</label>
 
           <select
             name="status"
@@ -211,7 +294,7 @@ function AddStudentPage() {
           <button
             type="button"
             className="cancel-btn"
-            onClick={() => navigate("/students")}
+            onClick={() => navigate("/academic/students")}
             disabled={loading}
           >
             Cancel

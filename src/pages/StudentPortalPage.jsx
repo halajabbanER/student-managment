@@ -1,213 +1,372 @@
+import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+
 import useAuth from "../hooks/useAuth";
 import useStudents from "../hooks/useStudents";
+import useCourses from "../hooks/useCourses";
+import useTeachers from "../hooks/useTeachers";
 
 import "./StudentPortalPage.css";
 
 function StudentPortalPage() {
-  const { user } = useAuth();
-  const { students } = useStudents();
+  const navigate = useNavigate();
 
-  const student = students.find(
-    (item) => Number(item.id) === Number(user?.studentId),
-  );
+  const { user, logout } = useAuth();
+  const { students } = useStudents();
+  const { courses } = useCourses();
+  const { teachers } = useTeachers();
+
+  // =========================
+  // CURRENT STUDENT
+  // =========================
+
+  const student = useMemo(() => {
+    return students.find(
+      (item) => String(item.studentId || item.id) === String(user?.studentId),
+    );
+  }, [students, user]);
+
+  // =========================
+  // STUDENT COURSES
+  // =========================
+
+  const studentCourses = useMemo(() => {
+    if (!student) {
+      return [];
+    }
+
+    const studentId = student.studentId || student.id;
+
+    return courses.filter((course) =>
+      (course.students || []).some((id) => String(id) === String(studentId)),
+    );
+  }, [courses, student]);
+
+  // =========================
+  // TEACHER NAME
+  // =========================
+
+  const getTeacherName = (teacherId) => {
+    if (!teacherId) {
+      return "Not Assigned";
+    }
+
+    const teacher = teachers.find(
+      (item) =>
+        String(item.id) === String(teacherId) ||
+        String(item.teacherId) === String(teacherId),
+    );
+
+    return teacher?.name || "Not Assigned";
+  };
+
+  // =========================
+  // STUDENT GRADE
+  // =========================
+
+  const getCourseGrade = (course) => {
+    if (!course.grades || !student) {
+      return "-";
+    }
+
+    const studentId = student.studentId || student.id;
+
+    const grade = course.grades.find(
+      (item) => String(item.studentId) === String(studentId),
+    );
+
+    if (!grade) {
+      return "-";
+    }
+
+    return grade.grade;
+  };
+
+  // =========================
+  // AVERAGE
+  // =========================
+
+  const average = useMemo(() => {
+    if (!student) {
+      return "0.00";
+    }
+
+    const studentId = student.studentId || student.id;
+
+    const grades = [];
+
+    studentCourses.forEach((course) => {
+      const studentGrade = course.grades?.find(
+        (item) => String(item.studentId) === String(studentId),
+      );
+
+      if (studentGrade && studentGrade.grade !== "") {
+        grades.push(Number(studentGrade.grade));
+      }
+    });
+
+    if (grades.length === 0) {
+      return "0.00";
+    }
+
+    const total = grades.reduce((sum, grade) => sum + grade, 0);
+
+    return (total / grades.length).toFixed(2);
+  }, [studentCourses, student]);
+
+  // =========================
+  // LOGOUT
+  // =========================
+
+  const handleLogout = () => {
+    logout();
+
+    navigate("/login", {
+      replace: true,
+    });
+  };
+
+  // =========================
+  // STUDENT NOT FOUND
+  // =========================
 
   if (!student) {
     return (
       <div className="student-portal-page">
-        <div className="portal-message">
+        <div className="student-portal-error">
           <h2>Student information not found</h2>
 
-          <p>Please contact the administrator.</p>
+          <p>Please contact Academic Administration.</p>
+
+          <button onClick={handleLogout}>Logout</button>
         </div>
       </div>
     );
   }
 
-  const courses = student.courses || [];
-
-  const average =
-    courses.length > 0
-      ? (
-          courses.reduce((total, course) => total + Number(course.grade), 0) /
-          courses.length
-        ).toFixed(2)
-      : "0.00";
-
   return (
     <div className="student-portal-page">
-      {/* Welcome */}
+      {/* =====================
+          HEADER
+      ====================== */}
 
-      <div className="portal-welcome">
+      <header className="student-portal-header">
         <div>
-          <span className="portal-label">Student Portal</span>
+          <h2>🎓 Student Portal</h2>
 
-          <h1>Welcome, {student.name}</h1>
-
-          <p>View your academic information, courses, grades and schedule.</p>
+          <p>
+            Welcome, <strong>{student.name}</strong>
+          </p>
         </div>
 
-        <div className="student-avatar">
-          {student.name
-            .split(" ")
-            .map((word) => word[0])
-            .slice(0, 2)
-            .join("")
-            .toUpperCase()}
-        </div>
-      </div>
+        <button type="button" onClick={handleLogout}>
+          Logout
+        </button>
+      </header>
 
-      {/* Statistics */}
+      <main className="student-portal-content">
+        {/* =====================
+            PROFILE
+        ====================== */}
 
-      <div className="portal-stats">
-        <div className="portal-stat-card">
-          <span>Student ID</span>
-          <strong>{student.id}</strong>
-        </div>
-
-        <div className="portal-stat-card">
-          <span>Courses</span>
-          <strong>{courses.length}</strong>
-        </div>
-
-        <div className="portal-stat-card">
-          <span>Average</span>
-          <strong>{average}</strong>
-        </div>
-
-        <div className="portal-stat-card">
-          <span>Status</span>
-          <strong>{student.status}</strong>
-        </div>
-      </div>
-
-      {/* Personal Information */}
-
-      <div className="portal-section">
-        <div className="portal-section-header">
-          <div>
-            <h2>Personal Information</h2>
-            <p>Your academic information.</p>
-          </div>
-        </div>
-
-        <div className="portal-info-grid">
-          <div className="portal-info-item">
-            <span>Full Name</span>
-            <strong>{student.name}</strong>
+        <section className="student-profile">
+          <div className="student-profile-avatar">
+            {student.name
+              ?.split(" ")
+              .map((word) => word[0])
+              .slice(0, 2)
+              .join("")
+              .toUpperCase()}
           </div>
 
-          <div className="portal-info-item">
-            <span>Student ID</span>
-            <strong>{student.id}</strong>
+          <div className="student-profile-info">
+            <h1>{student.name}</h1>
+
+            <p>
+              <strong>Student ID:</strong> {student.studentId || student.id}
+            </p>
+
+            <p>
+              <strong>Department:</strong> {student.department || "-"}
+            </p>
+
+            <p>
+              <strong>Academic Level:</strong> {student.level || "-"}
+            </p>
+
+            <span>{student.status || "Active"}</span>
+          </div>
+        </section>
+
+        {/* =====================
+            STATISTICS
+        ====================== */}
+
+        <section className="student-statistics">
+          <div className="student-stat-card">
+            <div>📚</div>
+
+            <span>My Courses</span>
+
+            <strong>{studentCourses.length}</strong>
           </div>
 
-          <div className="portal-info-item">
-            <span>Email</span>
-            <strong>{student.email || "-"}</strong>
+          <div className="student-stat-card">
+            <div>📊</div>
+
+            <span>Average</span>
+
+            <strong>{average}</strong>
           </div>
 
-          <div className="portal-info-item">
-            <span>Department</span>
-            <strong>{student.department || "-"}</strong>
+          <div className="student-stat-card">
+            <div>📝</div>
+
+            <span>Exams</span>
+
+            <strong>
+              {studentCourses.reduce(
+                (total, course) => total + (course.exams?.length || 0),
+                0,
+              )}
+            </strong>
           </div>
 
-          <div className="portal-info-item">
-            <span>Academic Level</span>
-            <strong>{student.level || "-"}</strong>
-          </div>
+          <div className="student-stat-card">
+            <div>🎓</div>
 
-          <div className="portal-info-item">
             <span>Status</span>
 
-            <span
-              className={`portal-status ${student.status?.toLowerCase() || ""}`}
-            >
-              {student.status}
-            </span>
+            <strong className="student-active-text">
+              {student.status || "Active"}
+            </strong>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Courses */}
+        {/* =====================
+            COURSES
+        ====================== */}
 
-      <div className="portal-section">
-        <div className="portal-section-header">
-          <div>
-            <h2>My Courses & Grades</h2>
+        <section className="student-courses-section">
+          <div className="student-section-title">
+            <div>
+              <h2>My Courses</h2>
 
-            <p>Your registered courses and current grades.</p>
+              <p>Courses you are currently enrolled in.</p>
+            </div>
+
+            <span>{studentCourses.length} Courses</span>
           </div>
 
-          <span className="portal-average">Average: {average} / 100</span>
-        </div>
+          {studentCourses.length > 0 ? (
+            <div className="student-courses-grid">
+              {studentCourses.map((course) => {
+                const grade = getCourseGrade(course);
 
-        {courses.length > 0 ? (
-          <div className="portal-table-wrapper">
-            <table className="portal-table">
-              <thead>
-                <tr>
-                  <th>Course</th>
-                  <th>Grade</th>
-                  <th>Result</th>
-                </tr>
-              </thead>
+                return (
+                  <article className="student-course-card" key={course.id}>
+                    <div className="student-course-top">
+                      <div className="student-course-icon">📘</div>
 
-              <tbody>
-                {courses.map((course) => (
-                  <tr key={course.id}>
-                    <td>{course.name}</td>
+                      <span className="student-course-code">{course.code}</span>
+                    </div>
 
-                    <td>
-                      <span className="portal-grade">{course.grade}</span>
-                    </td>
+                    <h3>{course.name}</h3>
 
-                    <td>
-                      <span
-                        className={
-                          Number(course.grade) >= 50
-                            ? "portal-result passed"
-                            : "portal-result failed"
-                        }
-                      >
-                        {Number(course.grade) >= 50 ? "Passed" : "Failed"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    <div className="student-course-details">
+                      <p>
+                        <span>👨‍🏫 Teacher</span>
+
+                        <strong>{getTeacherName(course.teacherId)}</strong>
+                      </p>
+
+                      <p>
+                        <span>🎓 Credits</span>
+
+                        <strong>{course.credits}</strong>
+                      </p>
+
+                      <p>
+                        <span>📅 Semester</span>
+
+                        <strong>{course.semester}</strong>
+                      </p>
+
+                      <p>
+                        <span>📊 Grade</span>
+
+                        <strong
+                          className={
+                            grade !== "-" && Number(grade) >= 50
+                              ? "grade-pass"
+                              : grade !== "-"
+                                ? "grade-fail"
+                                : ""
+                          }
+                        >
+                          {grade}
+                        </strong>
+                      </p>
+                    </div>
+
+                    <div className="student-course-footer">
+                      <span>{course.status}</span>
+
+                      <span>{course.exams?.length || 0} Exams</span>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="student-no-courses">
+              <div>📚</div>
+
+              <h3>No Courses Yet</h3>
+
+              <p>You are not enrolled in any courses yet.</p>
+            </div>
+          )}
+        </section>
+
+        {/* =====================
+            QUICK SECTIONS
+        ====================== */}
+
+        <section className="student-portal-menu">
+          <div className="student-menu-card">
+            <div>📊</div>
+
+            <h3>Grades</h3>
+
+            <p>View your course grades and academic results.</p>
           </div>
-        ) : (
-          <div className="portal-empty">No courses have been added yet.</div>
-        )}
-      </div>
 
-      {/* Exams - temporary */}
+          <div className="student-menu-card">
+            <div>📝</div>
 
-      <div className="portal-section">
-        <div className="portal-section-header">
-          <div>
-            <h2>My Exams</h2>
-            <p>Your upcoming exams.</p>
+            <h3>Exams</h3>
+
+            <p>View upcoming exams and exam information.</p>
           </div>
-        </div>
 
-        <div className="portal-empty">No exams added yet.</div>
-      </div>
+          <div className="student-menu-card">
+            <div>📅</div>
 
-      {/* Schedule - temporary */}
+            <h3>Schedule</h3>
 
-      <div className="portal-section">
-        <div className="portal-section-header">
-          <div>
-            <h2>Weekly Schedule</h2>
-
-            <p>Your weekly course schedule.</p>
+            <p>View your weekly course schedule.</p>
           </div>
-        </div>
 
-        <div className="portal-empty">No schedule added yet.</div>
-      </div>
+          <div className="student-menu-card">
+            <div>📢</div>
+
+            <h3>Announcements</h3>
+
+            <p>View announcements from your teachers.</p>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

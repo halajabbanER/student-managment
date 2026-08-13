@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import useAuth from "../hooks/useAuth";
 
-import "./Auth.css";
+import "../components/auth/Auth.css";
 
 function TeacherRegisterPage() {
   const navigate = useNavigate();

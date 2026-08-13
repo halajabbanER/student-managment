@@ -118,6 +118,32 @@ function useStudents() {
 
         const createdStudent = await createStudentAPI(newStudentData);
 
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        if (studentData.password) {
+          const existingUserIndex = users.findIndex(
+            (user) =>
+              user.role === "student" &&
+              String(user.studentId) === String(generatedStudentId),
+          );
+
+          const studentUser = {
+            id: createdStudent.id || Date.now(),
+            name: createdStudent.name,
+            studentId: generatedStudentId,
+            password: studentData.password,
+            role: "student",
+          };
+
+          if (existingUserIndex >= 0) {
+            users[existingUserIndex] = studentUser;
+          } else {
+            users.push(studentUser);
+          }
+
+          localStorage.setItem("users", JSON.stringify(users));
+        }
+
         const finalStudent = {
           ...createdStudent,
 
@@ -130,7 +156,7 @@ function useStudents() {
 
           schedule: createdStudent.schedule || [],
 
-          accountCreated: false,
+          accountCreated: Boolean(studentData.password),
 
           source: "local",
         };
@@ -140,6 +166,7 @@ function useStudents() {
         return {
           success: true,
           student: finalStudent,
+          studentPassword: studentData.password || "",
         };
       } catch (err) {
         console.error("Add Student Error:", err);
