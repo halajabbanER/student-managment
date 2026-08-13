@@ -182,7 +182,7 @@ function AddStudentPage() {
           {errors.level && <p className="error-message">{errors.level}</p>}
         </div>
 
-        {/* Status */}
+      
         <div className="form-group">
           <label>Status</label>
 

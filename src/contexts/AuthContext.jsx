@@ -1,6 +1,6 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
-export const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
@@ -9,26 +9,89 @@ function AuthProvider({ children }) {
 
       return savedUser ? JSON.parse(savedUser) : null;
     } catch (error) {
-      console.error("Error reading current user:", error);
+      console.error("Current User Error:", error);
+
       return null;
     }
   });
 
-  const login = (email, password) => {
+  // Create default Admin + Academic accounts
+  useEffect(() => {
     try {
-      const normalizedEmail = String(email).trim().toLowerCase();
       const users = JSON.parse(localStorage.getItem("users")) || [];
 
-      const foundUser = users.find(
-        (user) =>
-          user.email.trim().toLowerCase() === normalizedEmail &&
-          user.password === password,
-      );
+      const defaultAccounts = [
+        {
+          id: 1,
+          name: "System Admin",
+          email: "admin@hala.com",
+          password: "Admin123",
+          role: "admin",
+        },
+        {
+          id: 2,
+          name: "Academic Staff",
+          email: "academic@hala.com",
+          password: "Academic123",
+          role: "academic",
+        },
+      ];
+
+      const updatedUsers = [...users];
+
+      defaultAccounts.forEach((defaultAccount) => {
+        const existingIndex = updatedUsers.findIndex(
+          (item) =>
+            item.role === defaultAccount.role &&
+            item.email?.toLowerCase() === defaultAccount.email.toLowerCase(),
+        );
+
+        if (existingIndex >= 0) {
+          updatedUsers[existingIndex] = {
+            ...updatedUsers[existingIndex],
+            ...defaultAccount,
+          };
+          return;
+        }
+
+        updatedUsers.push(defaultAccount);
+      });
+
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+    } catch (error) {
+      console.error("Initialize Users Error:", error);
+    }
+  }, []);
+
+  // Login
+  const login = (identifier, password) => {
+    try {
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+
+      const foundUser = users.find((item) => {
+        // Admin / Academic
+        if (item.role === "admin" || item.role === "academic") {
+          return (
+            item.email?.toLowerCase() === String(identifier).toLowerCase() &&
+            item.password === password
+          );
+        }
+
+        // Student
+        if (item.role === "student") {
+          return (
+            String(item.studentId) === String(identifier) &&
+            item.password === password
+          );
+        }
+
+        return false;
+      });
 
       if (!foundUser) {
         return {
           success: false,
-          message: "Invalid email or password",
+          message: "Invalid login information",
         };
       }
 
@@ -41,7 +104,7 @@ function AuthProvider({ children }) {
         user: foundUser,
       };
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Login Error:", error);
 
       return {
         success: false,
@@ -50,37 +113,65 @@ function AuthProvider({ children }) {
     }
   };
 
+  // Student Register
   const register = (userData) => {
     try {
       const users = JSON.parse(localStorage.getItem("users")) || [];
 
+      const students = JSON.parse(localStorage.getItem("students")) || [];
+
+      const studentExists = students.find(
+        (student) => String(student.studentId) === String(userData.studentId),
+      );
+
+      if (!studentExists) {
+        return {
+          success: false,
+          message:
+            "Student ID not found. Please contact Academic Administration.",
+        };
+      }
+
       const existingUser = users.find(
-        (user) => user.email.toLowerCase() === userData.email.toLowerCase(),
+        (item) =>
+          item.role === "student" &&
+          String(item.studentId) === String(userData.studentId),
       );
 
       if (existingUser) {
         return {
           success: false,
-          message: "This email is already registered",
+          message: "This Student ID is already registered",
         };
       }
 
       const newUser = {
         id: Date.now(),
-        name: userData.name,
-        email: userData.email,
+        name: studentExists.name,
+        studentId: studentExists.studentId,
         password: userData.password,
+        role: "student",
       };
 
-      const updatedUsers = [...users, newUser];
+      localStorage.setItem("users", JSON.stringify([...users, newUser]));
 
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
+      const updatedStudents = students.map((student) =>
+        String(student.studentId) === String(userData.studentId)
+          ? {
+              ...student,
+              accountCreated: true,
+            }
+          : student,
+      );
+
+      localStorage.setItem("students", JSON.stringify(updatedStudents));
 
       return {
         success: true,
+        user: newUser,
       };
     } catch (error) {
-      console.error("Register error:", error);
+      console.error("Register Error:", error);
 
       return {
         success: false,
@@ -89,12 +180,17 @@ function AuthProvider({ children }) {
     }
   };
 
+  // Logout
   const logout = () => {
     setUser(null);
+
     localStorage.removeItem("currentUser");
   };
 
   const isAuthenticated = Boolean(user);
+  const isAdmin = user?.role === "admin";
+  const isAcademic = user?.role === "academic";
+  const isStudent = user?.role === "student";
 
   return (
     <AuthContext.Provider
@@ -104,6 +200,9 @@ function AuthProvider({ children }) {
         register,
         logout,
         isAuthenticated,
+        isAdmin,
+        isAcademic,
+        isStudent,
       }}
     >
       {children}
@@ -112,3 +211,4 @@ function AuthProvider({ children }) {
 }
 
 export default AuthProvider;
+export { AuthContext, AuthProvider };

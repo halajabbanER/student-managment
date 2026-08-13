@@ -57,27 +57,6 @@ function StudentDetailsPage() {
     setGrade("");
   };
 
-  const handleEditGrade = (course) => {
-    const newGrade = prompt("Enter new grade:", course.grade);
-
-    if (
-      newGrade !== null &&
-      newGrade !== "" &&
-      Number(newGrade) >= 0 &&
-      Number(newGrade) <= 100
-    ) {
-      updateCourseGrade(student.id, course.id, newGrade);
-    }
-  };
-
-  const handleDeleteCourse = (courseId) => {
-    const confirmDelete = window.confirm("Delete this course?");
-
-    if (confirmDelete) {
-      deleteCourse(student.id, courseId);
-    }
-  };
-
   return (
     <div className="student-details-page">
       <h1>Student Details</h1>
@@ -242,6 +221,7 @@ function StudentDetailsPage() {
             onClick={() => navigate(`/student/edit/${student.id}`)}
           >
             Edit Student
+            
           </button>
 
           <button

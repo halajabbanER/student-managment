@@ -8,12 +8,11 @@ import "./Auth.css";
 
 function RegisterPage() {
   const navigate = useNavigate();
-
   const { register } = useAuth();
 
   const { values, handleChange, resetForm } = useForm({
     name: "",
-    email: "",
+    studentId: "",
     password: "",
     confirmPassword: "",
   });
@@ -23,25 +22,18 @@ function RegisterPage() {
   const validateForm = () => {
     const newErrors = {};
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
-    // Name
     if (!values.name.trim()) {
       newErrors.name = "Full name is required";
     } else if (values.name.trim().length < 3) {
       newErrors.name = "Name must be at least 3 characters";
     }
 
-    // Email
-    if (!values.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!emailRegex.test(values.email)) {
-      newErrors.email = "Please enter a valid email";
+    if (!values.studentId.trim()) {
+      newErrors.studentId = "Student ID is required";
     }
 
-    // Password
     if (!values.password) {
       newErrors.password = "Password is required";
     } else if (!passwordRegex.test(values.password)) {
@@ -49,7 +41,6 @@ function RegisterPage() {
         "Password must contain at least 8 characters, uppercase, lowercase and a number";
     }
 
-    // Confirm Password
     if (!values.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password";
     } else if (values.password !== values.confirmPassword) {
@@ -69,6 +60,7 @@ function RegisterPage() {
     setErrors((prevErrors) => ({
       ...prevErrors,
       [name]: "",
+      general: "",
     }));
   };
 
@@ -81,19 +73,23 @@ function RegisterPage() {
 
     const result = register({
       name: values.name.trim(),
-      email: values.email.trim(),
+
+      studentId: Number(values.studentId),
+
       password: values.password,
+
+      role: "student",
     });
 
     if (!result.success) {
       setErrors({
-        email: result.message,
+        general: result.message,
       });
 
       return;
     }
 
-    alert("Account created successfully!");
+    alert("Student account created successfully!");
 
     resetForm();
 
@@ -103,12 +99,13 @@ function RegisterPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Create Account</h1>
+        <h1>Create Student Account</h1>
 
-        <p className="auth-subtitle">Create your account to manage students.</p>
+        <p className="auth-subtitle">Register using your Student ID</p>
 
-        <form onSubmit={handleSubmit}>
-          {/* Full Name */}
+        {errors.general && <p className="login-error">{errors.general}</p>}
+
+        <form onSubmit={handleSubmit} autoComplete="off">
           <div className="form-group">
             <label>Full Name</label>
 
@@ -123,22 +120,23 @@ function RegisterPage() {
             {errors.name && <p className="error-message">{errors.name}</p>}
           </div>
 
-          {/* Email */}
           <div className="form-group">
-            <label>Email</label>
+            <label>Student ID</label>
 
             <input
-              type="email"
-              name="email"
-              placeholder="example@gmail.com"
-              value={values.email}
+              type="number"
+              name="studentId"
+              placeholder="Enter your Student ID"
+              value={values.studentId}
               onChange={handleInputChange}
+              autoComplete="off"
             />
 
-            {errors.email && <p className="error-message">{errors.email}</p>}
+            {errors.studentId && (
+              <p className="error-message">{errors.studentId}</p>
+            )}
           </div>
 
-          {/* Password */}
           <div className="form-group">
             <label>Password</label>
 
@@ -148,6 +146,7 @@ function RegisterPage() {
               placeholder="Enter password"
               value={values.password}
               onChange={handleInputChange}
+              autoComplete="new-password"
             />
 
             {errors.password && (
@@ -155,7 +154,6 @@ function RegisterPage() {
             )}
           </div>
 
-          {/* Confirm Password */}
           <div className="form-group">
             <label>Confirm Password</label>
 
@@ -165,6 +163,7 @@ function RegisterPage() {
               placeholder="Confirm password"
               value={values.confirmPassword}
               onChange={handleInputChange}
+              autoComplete="new-password"
             />
 
             {errors.confirmPassword && (

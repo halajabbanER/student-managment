@@ -6,12 +6,12 @@ import useForm from "../../hooks/useForm";
 
 import "./Auth.css";
 
-function LoginPage() {
+function AdminLoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const { values, handleChange, resetForm } = useForm({
-    identifier: "",
+    email: "",
     password: "",
   });
 
@@ -32,8 +32,12 @@ function LoginPage() {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!values.identifier.trim()) {
-      newErrors.identifier = "Student ID or Academic Email is required";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!values.email.trim()) {
+      newErrors.email = "Admin email is required";
+    } else if (!emailRegex.test(values.email)) {
+      newErrors.email = "Please enter a valid email";
     }
 
     if (!values.password) {
@@ -52,7 +56,7 @@ function LoginPage() {
       return;
     }
 
-    const result = login(values.identifier.trim(), values.password);
+    const result = login(values.email.trim(), values.password);
 
     if (!result.success) {
       setErrors({
@@ -62,56 +66,44 @@ function LoginPage() {
       return;
     }
 
+    if (result.user.role !== "admin") {
+      setErrors({
+        general: "This account does not have administrator access.",
+      });
+
+      return;
+    }
+
     resetForm();
 
-    if (result.user.role === "student") {
-      navigate("/student-portal", {
-        replace: true,
-      });
-
-      return;
-    }
-
-    if (result.user.role === "academic") {
-      navigate("/academic", {
-        replace: true,
-      });
-
-      return;
-    }
-
-    setErrors({
-      general: "Please use the Admin Login page.",
+    navigate("/", {
+      replace: true,
     });
   };
 
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Student & Academic Login</h1>
+        <h1>Admin Login</h1>
 
-        <p className="auth-subtitle">
-          Students use Student ID, academic staff use email.
-        </p>
+        <p className="auth-subtitle">Sign in to the administration panel.</p>
 
         {errors.general && <p className="login-error">{errors.general}</p>}
 
         <form onSubmit={handleSubmit} autoComplete="off">
           <div className="form-group">
-            <label>Student ID or Academic Email</label>
+            <label>Admin Email</label>
 
             <input
-              type="text"
-              name="identifier"
-              placeholder="Student ID or academic@email.com"
-              value={values.identifier}
+              type="email"
+              name="email"
+              placeholder="admin@example.com"
+              value={values.email}
               onChange={handleInputChange}
               autoComplete="off"
             />
 
-            {errors.identifier && (
-              <p className="error-message">{errors.identifier}</p>
-            )}
+            {errors.email && <p className="error-message">{errors.email}</p>}
           </div>
 
           <div className="form-group">
@@ -132,22 +124,17 @@ function LoginPage() {
           </div>
 
           <button type="submit" className="auth-btn">
-            Login
+            Admin Login
           </button>
         </form>
 
         <p className="auth-link">
-          Student without an account?{" "}
-          <span onClick={() => navigate("/register")}>Register</span>
-        </p>
-
-        <p className="auth-link">
-          Administrator?{" "}
-          <span onClick={() => navigate("/admin-login")}>Admin Login</span>
+          Student or Academic Staff?{" "}
+          <span onClick={() => navigate("/login")}>User Login</span>
         </p>
       </div>
     </div>
   );
 }
 
-export default LoginPage;
+export default AdminLoginPage;

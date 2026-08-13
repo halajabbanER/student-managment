@@ -1,0 +1,258 @@
+
+.academic-students-page {
+  min-height: 100vh;
+  padding: 40px;
+  background: red;
+}
+.academic-students-page {
+  min-height: 100vh;
+  padding: 35px 45px;
+
+  background: #f5f6fa;
+}
+
+.academic-students-header {
+  margin-bottom: 25px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 20px;
+}
+
+.academic-students-header h1 {
+  margin: 0 0 6px;
+
+  color: #111827;
+}
+
+.academic-students-header p {
+  margin: 0;
+
+  color: #6b7280;
+}
+
+.academic-students-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.academic-students-actions button {
+  padding: 11px 17px;
+
+  border: none;
+  border-radius: 9px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.25s;
+}
+
+.back-btn {
+  background: #ffffff;
+  color: #374151;
+
+  border: 1px solid #d1d5db !important;
+}
+
+.back-btn:hover {
+  background: #f9fafb;
+}
+
+.add-btn {
+  background: #4f46e5;
+  color: #ffffff;
+}
+
+.academic-students-actions button:hover {
+  transform: translateY(-2px);
+}
+
+/* Table */
+
+.academic-students-table-wrapper {
+  overflow-x: auto;
+
+  background: #ffffff;
+
+  border-radius: 16px;
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+}
+
+.academic-students-table {
+  width: 100%;
+
+  border-collapse: collapse;
+}
+
+.academic-students-table th {
+  padding: 15px;
+
+  text-align: left;
+
+  background: #f9fafb;
+
+  color: #4b5563;
+
+  font-size: 14px;
+}
+
+.academic-students-table td {
+  padding: 15px;
+
+  border-top: 1px solid #e5e7eb;
+
+  color: #374151;
+}
+
+.academic-students-table tbody tr {
+  transition: 0.2s;
+}
+
+.academic-students-table tbody tr:hover {
+  background: #faf9ff;
+}
+
+/* Student ID */
+
+.student-id-badge {
+  display: inline-block;
+
+  padding: 6px 10px;
+
+  border-radius: 20px;
+
+  background: #eef2ff;
+  color: #4f46e5;
+
+  font-weight: 700;
+}
+
+.no-id {
+  color: #9ca3af;
+}
+
+/* Account */
+
+.account-created {
+  padding: 5px 10px;
+
+  border-radius: 20px;
+
+  background: #dcfce7;
+  color: #16a34a;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.account-not-created {
+  padding: 5px 10px;
+
+  border-radius: 20px;
+
+  background: #fef3c7;
+  color: #d97706;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Actions */
+
+.academic-table-actions {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 7px;
+}
+
+.academic-table-actions button {
+  padding: 7px 10px;
+
+  border: none;
+  border-radius: 7px;
+
+  color: white;
+
+  cursor: pointer;
+}
+
+.generate-id-btn {
+  background: #7c3aed;
+}
+
+.view-student-btn {
+  background: #0ea5e9;
+}
+
+.edit-student-btn {
+  background: #f59e0b;
+}
+
+.academic-table-actions button:hover {
+  opacity: 0.9;
+}
+
+/* Empty */
+
+.academic-empty {
+  padding: 40px;
+
+  text-align: center;
+
+  background: white;
+
+  border-radius: 15px;
+}
+
+/* Dark Mode */
+
+body.dark-mode .academic-students-page {
+  background: #111827;
+}
+
+body.dark-mode .academic-students-table-wrapper,
+body.dark-mode .academic-empty {
+  background: #1f2937;
+}
+
+body.dark-mode .academic-students-table th {
+  background: #111827;
+  color: #d1d5db;
+}
+
+body.dark-mode .academic-students-table td {
+  color: #e5e7eb;
+
+  border-color: #374151;
+}
+
+body.dark-mode .academic-students-table tbody tr:hover {
+  background: #312e81;
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+  .academic-students-page {
+    padding: 20px 15px;
+  }
+
+  .academic-students-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .academic-students-actions {
+    width: 100%;
+  }
+
+  .academic-students-actions button {
+    flex: 1;
+  }
+}
