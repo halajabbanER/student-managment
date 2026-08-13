@@ -132,6 +132,11 @@ function AdminLoginPage() {
           Student or Academic Staff?{" "}
           <span onClick={() => navigate("/login")}>User Login</span>
         </p>
+
+        <p className="auth-link">
+          Roles ready to use?{" "}
+          <span onClick={() => navigate("/roles")}>Open Roles Hub</span>
+        </p>
       </div>
     </div>
   );

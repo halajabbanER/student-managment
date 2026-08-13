@@ -1,0 +1,316 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import useTeachers from "../hooks/useTeachers";
+
+import "./AcademicTeachersPage.css";
+
+function AcademicTeachersPage() {
+  const navigate = useNavigate();
+
+  const { teachers, addTeacher, deleteTeacher, assignTeacherId } =
+    useTeachers();
+
+  const [showForm, setShowForm] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    department: "",
+    title: "",
+    status: "Active",
+  });
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (
+      !formData.name.trim() ||
+      !formData.email.trim() ||
+      !formData.department ||
+      !formData.title
+    ) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    const result = addTeacher({
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      department: formData.department,
+      title: formData.title,
+      status: formData.status,
+    });
+
+    if (!result.success) {
+      return;
+    }
+
+    alert(
+      `Teacher added successfully.\nTeacher ID: ${result.teacher.teacherId}`,
+    );
+
+    setFormData({
+      name: "",
+      email: "",
+      department: "",
+      title: "",
+      status: "Active",
+    });
+
+    setShowForm(false);
+  };
+
+  const handleGenerateId = (id) => {
+    const result = assignTeacherId(id);
+
+    if (!result.success) {
+      alert(result.message);
+      return;
+    }
+
+    alert(`Teacher ID generated successfully: ${result.teacherId}`);
+  };
+
+  const handleDelete = (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this teacher?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    deleteTeacher(id);
+  };
+
+  return (
+    <div className="academic-teachers-page">
+      <div className="teachers-page-header">
+        <div>
+          <h1>Teachers</h1>
+
+          <p>Manage teachers and academic staff records.</p>
+        </div>
+
+        <div className="teachers-header-actions">
+          <button
+            type="button"
+            className="teachers-back-btn"
+            onClick={() => navigate("/academic")}
+          >
+             Dashboard
+          </button>
+
+          <button
+            type="button"
+            className="teachers-add-btn"
+            onClick={() => setShowForm(!showForm)}
+          >
+            {showForm ? "Close Form" : "+ Add Teacher"}
+          </button>
+        </div>
+      </div>
+
+      {showForm && (
+        <form className="teacher-form" onSubmit={handleSubmit}>
+          <h2>Add New Teacher</h2>
+
+          <div className="teacher-form-grid">
+            <div className="teacher-form-group">
+              <label>Full Name</label>
+
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter teacher name"
+                value={formData.name}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="teacher-form-group">
+              <label>Email</label>
+
+              <input
+                type="email"
+                name="email"
+                placeholder="teacher@university.com"
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="teacher-form-group">
+              <label>Department</label>
+
+              <select
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+              >
+                <option value="">Select Department</option>
+
+                <option value="Computer Engineering">
+                  Computer Engineering
+                </option>
+
+                <option value="Software Engineering">
+                  Software Engineering
+                </option>
+
+                <option value="Electrical Engineering">
+                  Electrical Engineering
+                </option>
+
+                <option value="Civil Engineering">Civil Engineering</option>
+              </select>
+            </div>
+
+            <div className="teacher-form-group">
+              <label>Academic Title</label>
+
+              <select
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+              >
+                <option value="">Select Title</option>
+
+                <option value="Professor">Professor</option>
+
+                <option value="Associate Professor">Associate Professor</option>
+
+                <option value="Assistant Professor">Assistant Professor</option>
+
+                <option value="Lecturer">Lecturer</option>
+              </select>
+            </div>
+
+            <div className="teacher-form-group">
+              <label>Status</label>
+
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+              >
+                <option value="Active">Active</option>
+
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" className="teacher-save-btn">
+            Add Teacher
+          </button>
+        </form>
+      )}
+
+      {teachers.length > 0 ? (
+        <div className="teachers-table-wrapper">
+          <table className="teachers-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Teacher ID</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Account</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {teachers.map((teacher) => (
+                <tr key={teacher.id}>
+                  <td>
+                    <strong>{teacher.name}</strong>
+                  </td>
+
+                  <td>
+                    {teacher.teacherId ? (
+                      <span className="teacher-id-badge">
+                        {teacher.teacherId}
+                      </span>
+                    ) : (
+                      <span className="teacher-no-id">Not assigned</span>
+                    )}
+                  </td>
+
+                  <td>{teacher.email}</td>
+
+                  <td>{teacher.department}</td>
+
+                  <td>{teacher.title}</td>
+
+                  <td>
+                    <span
+                      className={`teacher-status ${teacher.status.toLowerCase()}`}
+                    >
+                      {teacher.status}
+                    </span>
+                  </td>
+
+                  <td>
+                    <span
+                      className={
+                        teacher.accountCreated
+                          ? "teacher-account-created"
+                          : "teacher-account-pending"
+                      }
+                    >
+                      {teacher.accountCreated ? "Created" : "Not Created"}
+                    </span>
+                  </td>
+
+                  <td>
+                    <div className="teacher-table-actions">
+                      {!teacher.teacherId && (
+                        <button
+                          type="button"
+                          className="teacher-generate-btn"
+                          onClick={() => handleGenerateId(teacher.id)}
+                        >
+                          Generate ID
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        className="teacher-delete-btn"
+                        onClick={() => handleDelete(teacher.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="teachers-empty">
+          <h3>No teachers found</h3>
+
+          <p>Add your first teacher to get started.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default AcademicTeachersPage;

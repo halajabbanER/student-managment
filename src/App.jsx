@@ -12,23 +12,27 @@ import AddStudentPage from "./pages/AddStudentPage";
 import StudentDetailsPage from "./pages/StudentDetailsPage";
 import StudentFormPage from "./pages/StudentFormPage";
 
-/* Academic */
+/* Academic Pages */
 import AcademicDashboardPage from "./pages/AcademicDashboardPage";
+import AcademicStudentsPage from "./pages/AcademicStudentsPage";
+import AcademicTeachersPage from "./pages/AcademicTeachersPage";
 
 /* Student */
 import StudentPortalPage from "./pages/StudentPortalPage";
 
 /* Other */
 import NotFoundPage from "./pages/NotFoundPage";
+import RolesHubPage from "./pages/RolesHubPage";
 
+/* Components */
 import MainLayout from "./components/common/MainLayout";
 import RoleRoute from "./components/auth/RoleRoute";
-import AcademicStudentsPage from "./pages/AcademicStudentsPage";
+
 function App() {
   return (
     <Routes>
       {/* =========================
-          Public Pages
+          Public Routes
       ========================= */}
 
       <Route path="/login" element={<LoginPage />} />
@@ -37,8 +41,24 @@ function App() {
 
       <Route path="/admin-login" element={<AdminLoginPage />} />
 
+      <Route path="/roles" element={<RolesHubPage />} />
+
       {/* =========================
-          Student
+          Student Portal
+      ========================= */}
+
+      <Route
+        path="/student-portal"
+        element={
+          <RoleRoute allowedRoles={["student"]}>
+            <StudentPortalPage />
+          </RoleRoute>
+        }
+      />
+
+      {/* =========================
+          Shared Student Management
+          Admin + Academic
       ========================= */}
 
       <Route
@@ -69,7 +89,7 @@ function App() {
       />
 
       {/* =========================
-          Academic
+          Academic Routes
       ========================= */}
 
       <Route
@@ -80,6 +100,7 @@ function App() {
           </RoleRoute>
         }
       />
+
       <Route
         path="/academic/students"
         element={
@@ -88,8 +109,18 @@ function App() {
           </RoleRoute>
         }
       />
+
+      <Route
+        path="/academic/teachers"
+        element={
+          <RoleRoute allowedRoles={["academic"]}>
+            <AcademicTeachersPage />
+          </RoleRoute>
+        }
+      />
+
       {/* =========================
-          Admin
+          Admin Routes
       ========================= */}
 
       <Route
@@ -102,12 +133,6 @@ function App() {
         <Route path="/" element={<HomePage />} />
 
         <Route path="/students" element={<StudentsPage />} />
-
-        <Route path="/student/new" element={<AddStudentPage />} />
-
-        <Route path="/student/:id" element={<StudentDetailsPage />} />
-
-        <Route path="/student/edit/:id" element={<StudentFormPage />} />
       </Route>
 
       {/* =========================

@@ -1,0 +1,249 @@
+.roles-page {
+  min-height: 100vh;
+  padding: 40px 55px;
+  background:
+    radial-gradient(circle at top left, rgba(79, 70, 229, 0.08), transparent 30%),
+    linear-gradient(180deg, #f8f9ff 0%, #f4f6fb 100%);
+  color: #111827;
+}
+
+.roles-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+  padding: 32px;
+  margin-bottom: 28px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(79, 70, 229, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.roles-label {
+  display: inline-flex;
+  margin-bottom: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(79, 70, 229, 0.12);
+  color: #4f46e5;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.roles-hero h1 {
+  margin: 0 0 10px;
+  font-size: 38px;
+  line-height: 1.1;
+}
+
+.roles-hero p {
+  margin: 0;
+  max-width: 720px;
+  color: #4b5563;
+  line-height: 1.7;
+}
+
+.roles-hero-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.status-chip,
+.logout-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.status-chip {
+  background: #ecfdf5;
+  color: #0f9d58;
+}
+
+.status-user {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.logout-chip {
+  border: none;
+  background: #ef4444;
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.logout-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(239, 68, 68, 0.22);
+}
+
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.role-card,
+.action-card {
+  width: 100%;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.role-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 20px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.role-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(79, 70, 229, 0.3);
+  box-shadow: 0 18px 30px rgba(79, 70, 229, 0.12);
+}
+
+.role-card-icon {
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 16px;
+  background: #f8fafc;
+  font-size: 24px;
+}
+
+.role-card-body h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.role-card-body p {
+  margin: 0 0 8px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.role-card-action {
+  color: #4f46e5;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.role-card-arrow {
+  margin-left: auto;
+  color: #4f46e5;
+  font-size: 18px;
+}
+
+.roles-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.action-card {
+  padding: 22px;
+  background: linear-gradient(180deg, #ffffff, #f8faff);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 20px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+}
+
+.action-card h3 {
+  margin: 0 0 8px;
+  color: #111827;
+}
+
+.action-card p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.roles-summary {
+  padding: 24px 28px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(79, 70, 229, 0.1);
+  border-radius: 20px;
+}
+
+.roles-summary h2 {
+  margin: 0 0 14px;
+}
+
+.summary-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.summary-tags span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4f46e5;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 1100px) {
+  .roles-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .roles-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .roles-page {
+    padding: 20px 15px;
+  }
+
+  .roles-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 22px;
+  }
+
+  .roles-hero h1 {
+    font-size: 30px;
+  }
+
+  .roles-hero-status {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .roles-grid {
+    grid-template-columns: 1fr;
+  }
+}
