@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import useCourses from "../hooks/useCourses";
@@ -27,6 +27,17 @@ function CourseEnrollmentPage() {
   const [selectedStudents, setSelectedStudents] = useState(() => {
     return course?.students || [];
   });
+
+  useEffect(() => {
+    if (!course) {
+      setSelectedStudents([]);
+      setSearchTerm("");
+      return;
+    }
+
+    setSelectedStudents(course.students || []);
+    setSearchTerm("");
+  }, [course?.id, course]);
 
   // =========================
   // DEPARTMENT
@@ -359,4 +370,5 @@ function CourseEnrollmentPage() {
 }
 
 export default CourseEnrollmentPage;
+
 

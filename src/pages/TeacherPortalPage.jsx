@@ -48,8 +48,8 @@ function TeacherPortalPage() {
     const ids = new Set();
 
     teacherCourses.forEach((course) => {
-      (course.students || []).forEach((id) => {
-        ids.add(String(id));
+      (course.students || []).forEach((studentId) => {
+        ids.add(String(studentId));
       });
     });
 
@@ -102,8 +102,6 @@ function TeacherPortalPage() {
       </header>
 
       <main className="teacher-portal-content">
-        {/* Profile */}
-
         <section className="teacher-profile-section">
           <div className="teacher-profile-avatar">
             {teacher.name
@@ -132,8 +130,6 @@ function TeacherPortalPage() {
             <span>{teacher.status || "Active"}</span>
           </div>
         </section>
-
-        {/* Statistics */}
 
         <section className="teacher-statistics">
           <div className="teacher-stat-card">
@@ -171,8 +167,6 @@ function TeacherPortalPage() {
           </div>
         </section>
 
-        {/* Courses */}
-
         <section className="teacher-courses-section">
           <div className="teacher-section-title">
             <div>
@@ -202,21 +196,25 @@ function TeacherPortalPage() {
                     <div className="teacher-course-details">
                       <p>
                         <span>🎓 Credits</span>
+
                         <strong>{course.credits}</strong>
                       </p>
 
                       <p>
                         <span>📅 Semester</span>
+
                         <strong>{course.semester}</strong>
                       </p>
 
                       <p>
                         <span>👨‍🎓 Students</span>
+
                         <strong>{courseStudents.length}</strong>
                       </p>
 
                       <p>
                         <span>📝 Exams</span>
+
                         <strong>{course.exams?.length || 0}</strong>
                       </p>
                     </div>
@@ -229,20 +227,22 @@ function TeacherPortalPage() {
                           navigate(`/teacher/course/${course.id}/students`)
                         }
                       >
-                        👨‍🎓 View Students
+                        👨‍🎓 Students
                       </button>
 
                       <button
                         type="button"
                         className="teacher-grades-btn"
                         onClick={() =>
-                          navigate(`/teacher/course/${course.id}/grades`)
+                          navigate(`/teacher/course/${course.id}/students`)
                         }
                       >
                         📊 Grades
                       </button>
+
                       <button
                         type="button"
+                        className="teacher-exams-btn"
                         onClick={() =>
                           navigate(`/teacher/course/${course.id}/exams`)
                         }

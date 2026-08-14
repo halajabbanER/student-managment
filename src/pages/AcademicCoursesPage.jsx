@@ -247,22 +247,40 @@ function AcademicCoursesPage() {
   // =========================
 
   const availableTeachers = useMemo(() => {
-    if (!formData.departmentId) {
-      return teachers;
-    }
+    const activeTeachers = teachers.filter(
+      (teacher) => teacher.status === "Active",
+    );
+
+    const normalize = (value) => String(value || "").trim().toLowerCase();
 
     const selectedDepartment = departments.find(
       (department) => String(department.id) === String(formData.departmentId),
     );
 
-    if (!selectedDepartment) {
-      return teachers;
+    const departmentTeachers = selectedDepartment
+      ? activeTeachers.filter(
+          (teacher) =>
+            normalize(teacher.department) === normalize(selectedDepartment.name),
+        )
+      : activeTeachers;
+
+    const currentTeacher = teachers.find(
+      (teacher) =>
+        String(teacher.id) === String(formData.teacherId) ||
+        String(teacher.teacherId) === String(formData.teacherId),
+    );
+
+    if (!currentTeacher) {
+      return departmentTeachers;
     }
 
-    return teachers.filter(
-      (teacher) => teacher.department === selectedDepartment.name,
-    );
-  }, [teachers, departments, formData.departmentId]);
+    return [
+      currentTeacher,
+      ...departmentTeachers.filter(
+        (teacher) => String(teacher.id) !== String(currentTeacher.id),
+      ),
+    ];
+  }, [teachers, departments, formData.departmentId, formData.teacherId]);
 
   // =========================
   // SEARCH

@@ -18,6 +18,7 @@ function AcademicTeachersPage() {
     email: "",
     department: "",
     title: "",
+    password: "",
     status: "Active",
   });
 
@@ -37,7 +38,8 @@ function AcademicTeachersPage() {
       !formData.name.trim() ||
       !formData.email.trim() ||
       !formData.department ||
-      !formData.title
+      !formData.title ||
+      !formData.password.trim()
     ) {
       alert("Please fill in all required fields");
       return;
@@ -48,6 +50,7 @@ function AcademicTeachersPage() {
       email: formData.email.trim(),
       department: formData.department,
       title: formData.title,
+      password: formData.password.trim(),
       status: formData.status,
     });
 
@@ -56,7 +59,7 @@ function AcademicTeachersPage() {
     }
 
     alert(
-      `Teacher added successfully.\nTeacher ID: ${result.teacher.teacherId}`,
+      `Teacher added successfully.\nTeacher ID: ${result.teacher.teacherId}\nPassword: ${result.teacher.password}`,
     );
 
     setFormData({
@@ -64,6 +67,7 @@ function AcademicTeachersPage() {
       email: "",
       department: "",
       title: "",
+      password: "",
       status: "Active",
     });
 
@@ -122,7 +126,7 @@ function AcademicTeachersPage() {
       </div>
 
       {showForm && (
-        <form className="teacher-form" onSubmit={handleSubmit}>
+        <form className="teacher-form" onSubmit={handleSubmit} autoComplete="off">
           <h2>Add New Teacher</h2>
 
           <div className="teacher-form-grid">
@@ -135,6 +139,7 @@ function AcademicTeachersPage() {
                 placeholder="Enter teacher name"
                 value={formData.name}
                 onChange={handleChange}
+                autoComplete="off"
               />
             </div>
 
@@ -147,6 +152,20 @@ function AcademicTeachersPage() {
                 placeholder="teacher@university.com"
                 value={formData.email}
                 onChange={handleChange}
+                autoComplete="off"
+              />
+            </div>
+
+            <div className="teacher-form-group">
+              <label>Password</label>
+
+              <input
+                type="password"
+                name="password"
+                placeholder="Create teacher password"
+                value={formData.password}
+                onChange={handleChange}
+                autoComplete="new-password"
               />
             </div>
 

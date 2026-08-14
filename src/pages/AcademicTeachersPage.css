@@ -126,6 +126,10 @@
   border: 1px solid #d1d5db;
   border-radius: 8px;
 
+  background: #ffffff;
+  color: #111827;
+  font: inherit;
+
   outline: none;
 }
 
@@ -135,6 +139,16 @@
 
   box-shadow:
     0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.teacher-form-group input:-webkit-autofill,
+.teacher-form-group input:-webkit-autofill:hover,
+.teacher-form-group input:-webkit-autofill:focus,
+.teacher-form-group input:-webkit-autofill:active {
+  -webkit-text-fill-color: #111827;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+  transition: background-color 9999s ease-out 0s;
 }
 
 .teacher-save-btn {

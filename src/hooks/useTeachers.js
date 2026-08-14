@@ -36,10 +36,11 @@ function useTeachers() {
         department: teacherData.department,
         title: teacherData.title,
         status: teacherData.status || "Active",
+        password: teacherData.password || "",
 
         courses: [],
 
-        accountCreated: false,
+        accountCreated: Boolean(teacherData.password),
       };
 
       setTeachers((prevTeachers) => [...prevTeachers, newTeacher]);

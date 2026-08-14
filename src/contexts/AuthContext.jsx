@@ -160,8 +160,17 @@ export function AuthProvider({ children }) {
           String(item.password) === cleanPassword,
       );
 
-      if (teacher) {
-        if (teacher.status === "Inactive") {
+      const registeredTeacher = users.find(
+        (item) =>
+          item.role === "teacher" &&
+          String(item.teacherId || item.id) === cleanIdentifier &&
+          String(item.password) === cleanPassword,
+      );
+
+      const teacherAccount = teacher || registeredTeacher;
+
+      if (teacherAccount) {
+        if (teacherAccount.status === "Inactive") {
           return {
             success: false,
             message: "Your teacher account is inactive.",
@@ -169,7 +178,7 @@ export function AuthProvider({ children }) {
         }
 
         const foundUser = {
-          ...teacher,
+          ...teacherAccount,
           role: "teacher",
         };
 
@@ -366,6 +375,7 @@ export function AuthProvider({ children }) {
         String(teacher.teacherId) === String(userData.teacherId)
           ? {
               ...teacher,
+              password: userData.password,
               accountCreated: true,
             }
           : teacher,
