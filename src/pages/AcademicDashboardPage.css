@@ -239,6 +239,8 @@
   cursor: pointer;
 
   transition: 0.25s;
+
+  -webkit-tap-highlight-color: transparent;
 }
 
 .academic-card:hover {
@@ -247,6 +249,14 @@
   background: #eef2ff;
 
   transform: translateY(-3px);
+
+  box-shadow:
+    0 8px 20px rgba(79, 70, 229, 0.08);
+}
+
+.academic-card:focus,
+.academic-card:focus-visible {
+  outline: none;
 
   box-shadow:
     0 8px 20px rgba(79, 70, 229, 0.08);

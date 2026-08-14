@@ -41,6 +41,8 @@ function useCourses() {
 
         exams: [],
 
+        quizzes: [],
+
         createdAt: new Date().toISOString(),
       };
 
@@ -95,6 +97,8 @@ function useCourses() {
                 exams: updatedData.exams ?? course.exams ?? [],
 
                 grades: updatedData.grades ?? course.grades ?? [],
+
+                quizzes: updatedData.quizzes ?? course.quizzes ?? [],
               }
             : course,
         ),

@@ -113,16 +113,6 @@ function AcademicPortalPage() {
         </button>
       </header>
 
-      <div className="teacher-portal-shortcuts">
-        <button type="button" onClick={() => navigate("/academic/grades")}>
-          View Grades
-        </button>
-
-        <button type="button" onClick={() => navigate("/academic/courses")}>
-          Manage Courses
-        </button>
-      </div>
-
       <main className="teacher-portal-content">
         <section className="teacher-profile-section">
           <div className="teacher-profile-avatar">
@@ -281,6 +271,16 @@ function AcademicPortalPage() {
                         }
                       >
                         📝 Exams
+                      </button>
+
+                      <button
+                        type="button"
+                        className="teacher-quizzes-btn"
+                        onClick={() =>
+                          navigate(`/academic/course/${course.id}/quizzes`)
+                        }
+                      >
+                        🧪 Quizzes
                       </button>
                     </div>
                   </article>

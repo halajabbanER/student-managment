@@ -638,6 +638,14 @@ function AcademicCoursesPage() {
 
                 <button
                   type="button"
+                  className="course-quiz-btn"
+                  onClick={() => navigate(`/academic/course/${course.id}/quizzes`)}
+                >
+                  🧪 Quizzes
+                </button>
+
+                <button
+                  type="button"
                   className="course-edit-btn"
                   onClick={() => handleEdit(course)}
                 >

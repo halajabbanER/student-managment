@@ -29,6 +29,7 @@ import StudentDocumentPage from "./pages/StudentDocumentPage";
 import AcademicPortalPage from "./pages/AcademicPortalPage";
 import AcademicCourseStudentsPage from "./pages/AcademicCourseStudentsPage";
 import AcademicCourseExamsPage from "./pages/AcademicCourseExamsPage";
+import AcademicCourseQuizzesPage from "./pages/AcademicCourseQuizzesPage";
 import AcademicGradesPage from "./pages/AcademicGradesPage";
 import AcademicSchedulesPage from "./pages/AcademicSchedulesPage";
 /* Other */
@@ -78,7 +79,7 @@ function App() {
           <Route
             path="/academic/course/:id/students"
             element={
-              <RoleRoute allowedRoles={["academic"]}>
+              <RoleRoute allowedRoles={["admin", "academic"]}>
                 <AcademicCourseStudentsPage />
               </RoleRoute>
             }
@@ -87,7 +88,7 @@ function App() {
           <Route
             path="/academic/course/:id/grades"
             element={
-              <RoleRoute allowedRoles={["academic"]}>
+              <RoleRoute allowedRoles={["admin", "academic"]}>
                 <AcademicCourseStudentsPage />
               </RoleRoute>
             }
@@ -96,8 +97,16 @@ function App() {
           <Route
             path="/academic/course/:id/exams"
             element={
-              <RoleRoute allowedRoles={["academic"]}>
+              <RoleRoute allowedRoles={["admin", "academic"]}>
                 <AcademicCourseExamsPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/academic/course/:id/quizzes"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <AcademicCourseQuizzesPage />
               </RoleRoute>
             }
           />
