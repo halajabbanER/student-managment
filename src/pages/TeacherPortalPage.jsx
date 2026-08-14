@@ -1,7 +1,10 @@
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import useAuth from "../hooks/useAuth";
 import useTeachers from "../hooks/useTeachers";
+import useCourses from "../hooks/useCourses";
+import useStudents from "../hooks/useStudents";
 
 import "./TeacherPortalPage.css";
 
@@ -9,10 +12,56 @@ function TeacherPortalPage() {
   const navigate = useNavigate();
 
   const { user, logout } = useAuth();
+  const { teachers } = useTeachers();
+  const { courses } = useCourses();
+  const { students } = useStudents();
 
-  const { getTeacherByTeacherId } = useTeachers();
+  const teacher = useMemo(() => {
+    return teachers.find(
+      (item) => String(item.teacherId || item.id) === String(user?.teacherId),
+    );
+  }, [teachers, user]);
 
-  const teacher = getTeacherByTeacherId(user?.teacherId);
+  const teacherCourses = useMemo(() => {
+    if (!teacher) {
+      return [];
+    }
+
+    return courses.filter(
+      (course) =>
+        String(course.teacherId) === String(teacher.id) ||
+        String(course.teacherId) === String(teacher.teacherId),
+    );
+  }, [courses, teacher]);
+
+  const getCourseStudents = (course) => {
+    const enrolledIds = course.students || [];
+
+    return students.filter((student) => {
+      const studentIdentifier = student.studentId || student.id;
+
+      return enrolledIds.some((id) => String(id) === String(studentIdentifier));
+    });
+  };
+
+  const totalStudents = useMemo(() => {
+    const ids = new Set();
+
+    teacherCourses.forEach((course) => {
+      (course.students || []).forEach((id) => {
+        ids.add(String(id));
+      });
+    });
+
+    return ids.size;
+  }, [teacherCourses]);
+
+  const totalExams = useMemo(() => {
+    return teacherCourses.reduce(
+      (total, course) => total + (course.exams?.length || 0),
+      0,
+    );
+  }, [teacherCourses]);
 
   const handleLogout = () => {
     logout();
@@ -22,14 +71,28 @@ function TeacherPortalPage() {
     });
   };
 
+  if (!teacher) {
+    return (
+      <div className="teacher-portal-page">
+        <div className="teacher-portal-error">
+          <h2>Teacher information not found</h2>
+
+          <p>Please contact Academic Administration.</p>
+
+          <button onClick={handleLogout}>Logout</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="teacher-portal">
+    <div className="teacher-portal-page">
       <header className="teacher-portal-header">
         <div>
-          <h2>🎓 Teacher Portal</h2>
+          <h2>👨‍🏫 Teacher Portal</h2>
 
           <p>
-            Welcome, <strong>{teacher?.name || user?.name}</strong>
+            Welcome, <strong>{teacher.name}</strong>
           </p>
         </div>
 
@@ -39,78 +102,167 @@ function TeacherPortalPage() {
       </header>
 
       <main className="teacher-portal-content">
-        <section className="teacher-profile-card">
-          <div className="teacher-avatar">👨‍🏫</div>
+        {/* Profile */}
+
+        <section className="teacher-profile-section">
+          <div className="teacher-profile-avatar">
+            {teacher.name
+              ?.split(" ")
+              .map((word) => word[0])
+              .slice(0, 2)
+              .join("")
+              .toUpperCase()}
+          </div>
 
           <div>
-            <h1>{teacher?.name || user?.name}</h1>
+            <h1>{teacher.name}</h1>
 
             <p>
-              <strong>Teacher ID:</strong> {user?.teacherId}
+              <strong>Teacher ID:</strong> {teacher.teacherId}
             </p>
 
             <p>
-              <strong>Department:</strong> {teacher?.department || "-"}
+              <strong>Department:</strong> {teacher.department || "-"}
             </p>
 
             <p>
-              <strong>Academic Title:</strong> {teacher?.title || "-"}
+              <strong>Title:</strong> {teacher.title || "-"}
             </p>
 
-            <span>{teacher?.status || "Active"}</span>
+            <span>{teacher.status || "Active"}</span>
           </div>
         </section>
 
-        <section className="teacher-portal-grid">
-          <div className="teacher-portal-card">
-            <div className="portal-icon">📚</div>
+        {/* Statistics */}
 
-            <h3>My Courses</h3>
+        <section className="teacher-statistics">
+          <div className="teacher-stat-card">
+            <div>📚</div>
 
-            <p>View the courses assigned to you.</p>
+            <span>My Courses</span>
 
-            <strong>{teacher?.courses?.length || 0}</strong>
+            <strong>{teacherCourses.length}</strong>
           </div>
 
-          <div className="teacher-portal-card">
-            <div className="portal-icon">🎓</div>
+          <div className="teacher-stat-card">
+            <div>🎓</div>
 
-            <h3>My Students</h3>
+            <span>My Students</span>
 
-            <p>View students registered in your courses.</p>
+            <strong>{totalStudents}</strong>
           </div>
 
-          <div className="teacher-portal-card">
-            <div className="portal-icon">📊</div>
+          <div className="teacher-stat-card">
+            <div>📝</div>
 
-            <h3>Grades</h3>
+            <span>Exams</span>
 
-            <p>Add and update grades for your students.</p>
+            <strong>{totalExams}</strong>
           </div>
 
-          <div className="teacher-portal-card">
-            <div className="portal-icon">📝</div>
+          <div className="teacher-stat-card">
+            <div>📊</div>
 
-            <h3>Exams</h3>
+            <span>Status</span>
 
-            <p>Create and manage course exams.</p>
+            <strong className="teacher-status-text">
+              {teacher.status || "Active"}
+            </strong>
+          </div>
+        </section>
+
+        {/* Courses */}
+
+        <section className="teacher-courses-section">
+          <div className="teacher-section-title">
+            <div>
+              <h2>My Courses</h2>
+
+              <p>Courses assigned to you by Academic Administration.</p>
+            </div>
+
+            <span>{teacherCourses.length} Courses</span>
           </div>
 
-          <div className="teacher-portal-card">
-            <div className="portal-icon">📅</div>
+          {teacherCourses.length > 0 ? (
+            <div className="teacher-courses-grid">
+              {teacherCourses.map((course) => {
+                const courseStudents = getCourseStudents(course);
 
-            <h3>Schedule</h3>
+                return (
+                  <article className="teacher-course-card" key={course.id}>
+                    <div className="teacher-course-top">
+                      <div className="teacher-course-icon">📘</div>
 
-            <p>View your weekly teaching schedule.</p>
-          </div>
+                      <span className="teacher-course-code">{course.code}</span>
+                    </div>
 
-          <div className="teacher-portal-card">
-            <div className="portal-icon">📢</div>
+                    <h3>{course.name}</h3>
 
-            <h3>Announcements</h3>
+                    <div className="teacher-course-details">
+                      <p>
+                        <span>🎓 Credits</span>
+                        <strong>{course.credits}</strong>
+                      </p>
 
-            <p>Share announcements with students.</p>
-          </div>
+                      <p>
+                        <span>📅 Semester</span>
+                        <strong>{course.semester}</strong>
+                      </p>
+
+                      <p>
+                        <span>👨‍🎓 Students</span>
+                        <strong>{courseStudents.length}</strong>
+                      </p>
+
+                      <p>
+                        <span>📝 Exams</span>
+                        <strong>{course.exams?.length || 0}</strong>
+                      </p>
+                    </div>
+
+                    <div className="teacher-course-actions">
+                      <button
+                        type="button"
+                        className="teacher-view-students-btn"
+                        onClick={() =>
+                          navigate(`/teacher/course/${course.id}/students`)
+                        }
+                      >
+                        👨‍🎓 View Students
+                      </button>
+
+                      <button
+                        type="button"
+                        className="teacher-grades-btn"
+                        onClick={() =>
+                          navigate(`/teacher/course/${course.id}/grades`)
+                        }
+                      >
+                        📊 Grades
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(`/teacher/course/${course.id}/exams`)
+                        }
+                      >
+                        📝 Exams
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="teacher-empty-courses">
+              <div>📚</div>
+
+              <h3>No Courses Assigned</h3>
+
+              <p>No courses have been assigned to you yet.</p>
+            </div>
+          )}
         </section>
       </main>
     </div>

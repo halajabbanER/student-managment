@@ -1,0 +1,281 @@
+.academic-exams-page {
+  min-height: 100vh;
+  padding: 34px 44px;
+  background: #f5f6fa;
+}
+
+.academic-exams-header {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.academic-exams-header h1 {
+  margin: 0 0 6px;
+}
+
+.academic-exams-header p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.academic-exams-header button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #4f46e5;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.academic-exams-summary {
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.academic-exams-summary > div,
+.academic-exam-form,
+.academic-exams-list,
+.academic-exam-card,
+.academic-exams-empty {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.academic-exams-summary > div {
+  padding: 18px;
+}
+
+.academic-exams-summary span {
+  display: block;
+  margin-bottom: 8px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.academic-exams-summary strong {
+  color: #4f46e5;
+  font-size: 28px;
+}
+
+.academic-exams-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 18px;
+}
+
+.academic-exam-form {
+  padding: 20px;
+  align-self: start;
+}
+
+.academic-exam-form h2,
+.academic-exams-list-header h2 {
+  margin: 0 0 8px;
+}
+
+.academic-exam-form > p,
+.academic-exams-list-header p,
+.academic-exams-empty p {
+  margin: 0 0 16px;
+  color: #6b7280;
+}
+
+.academic-exam-error {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.academic-exam-field {
+  margin-bottom: 14px;
+}
+
+.academic-exam-field label {
+  display: block;
+  margin-bottom: 7px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.academic-exam-field input,
+.academic-exam-field select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
+  color: #111827;
+  outline: none;
+}
+
+.academic-exam-field input:focus,
+.academic-exam-field select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+.academic-exam-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.academic-exam-save {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 12px;
+  background: #4f46e5;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.academic-exams-list {
+  padding: 20px;
+}
+
+.academic-exams-cards {
+  display: grid;
+  gap: 14px;
+}
+
+.academic-exam-card {
+  padding: 16px;
+}
+
+.academic-exam-top {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.academic-exam-code,
+.academic-exam-type {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.academic-exam-code {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.academic-exam-type {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.academic-exam-card h3 {
+  margin: 0 0 6px;
+}
+
+.academic-exam-card p {
+  margin: 0 0 12px;
+  color: #6b7280;
+}
+
+.academic-exam-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.academic-exam-meta span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f9fafb;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.academic-exam-delete {
+  margin-top: 14px;
+  padding: 8px 11px;
+  border: none;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.academic-exams-empty {
+  padding: 48px 20px;
+  text-align: center;
+}
+
+.academic-exams-empty h3 {
+  margin: 0 0 6px;
+}
+
+body.dark-mode .academic-exams-page {
+  background: #111827;
+}
+
+body.dark-mode .academic-exams-summary > div,
+body.dark-mode .academic-exam-form,
+body.dark-mode .academic-exams-list,
+body.dark-mode .academic-exam-card,
+body.dark-mode .academic-exams-empty {
+  background: #1f2937;
+}
+
+body.dark-mode .academic-exams-header p,
+body.dark-mode .academic-exam-form > p,
+body.dark-mode .academic-exams-list-header p,
+body.dark-mode .academic-exams-empty p,
+body.dark-mode .academic-exam-card p {
+  color: #9ca3af;
+}
+
+body.dark-mode .academic-exam-field label {
+  color: #e5e7eb;
+}
+
+body.dark-mode .academic-exam-field input,
+body.dark-mode .academic-exam-field select,
+body.dark-mode .academic-exam-meta span {
+  background: #111827;
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+@media (max-width: 900px) {
+  .academic-exams-layout,
+  .academic-exams-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .academic-exams-page {
+    padding: 20px 15px;
+  }
+
+  .academic-exams-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .academic-exam-grid {
+    grid-template-columns: 1fr;
+  }
+}

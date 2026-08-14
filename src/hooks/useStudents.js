@@ -4,6 +4,25 @@ import useLocalStorage from "./useLocalStorage";
 function useStudents() {
   const [students, setStudents] = useLocalStorage("students", []);
 
+  const generateStudentId = useCallback(() => {
+    const year = new Date().getFullYear();
+    const existingIds = new Set(
+      students
+        .map((student) => String(student.studentId || "").trim())
+        .filter(Boolean),
+    );
+
+    let nextNumber = 1;
+    let studentId = "";
+
+    do {
+      studentId = `S${year}${String(nextNumber).padStart(4, "0")}`;
+      nextNumber += 1;
+    } while (existingIds.has(studentId));
+
+    return studentId;
+  }, [students]);
+
   // =========================
   // ADD STUDENT
   // =========================
@@ -144,15 +163,126 @@ function useStudents() {
 
   const deleteStudent = useCallback(
     (id) => {
-      setStudents((prevStudents) =>
-        prevStudents.filter((student) => String(student.id) !== String(id)),
+      const studentToDelete = students.find(
+        (student) =>
+          String(student.id) === String(id) ||
+          String(student.studentId) === String(id),
       );
+
+      const studentKeys = [
+        String(id),
+        String(studentToDelete?.id || ""),
+        String(studentToDelete?.studentId || ""),
+      ].filter(Boolean);
+
+      const matchesStudentKey = (value) =>
+        studentKeys.some((key) => String(value) === key);
+
+      setStudents((prevStudents) =>
+        prevStudents.filter(
+          (student) =>
+            !matchesStudentKey(student.id) &&
+            !matchesStudentKey(student.studentId),
+        ),
+      );
+
+      try {
+        const coursesRaw = JSON.parse(localStorage.getItem("courses") || "[]");
+        const courses = Array.isArray(coursesRaw) ? coursesRaw : [];
+
+        const updatedCourses = courses.map((course) => ({
+          ...course,
+          students: (Array.isArray(course.students) ? course.students : []).filter(
+            (studentRef) => !matchesStudentKey(studentRef),
+          ),
+          grades: (Array.isArray(course.grades) ? course.grades : []).filter(
+            (grade) => grade && !matchesStudentKey(grade.studentId),
+          ),
+        }));
+
+        localStorage.setItem("courses", JSON.stringify(updatedCourses));
+
+        const usersRaw = JSON.parse(localStorage.getItem("users") || "[]");
+        const users = Array.isArray(usersRaw) ? usersRaw : [];
+
+        const updatedUsers = users.filter((user) => {
+          if (user.role !== "student") {
+            return true;
+          }
+
+          return (
+            !matchesStudentKey(user.id) && !matchesStudentKey(user.studentId)
+          );
+        });
+
+        localStorage.setItem("users", JSON.stringify(updatedUsers));
+
+        const currentUserRaw = localStorage.getItem("currentUser");
+
+        if (currentUserRaw) {
+          const currentUser = JSON.parse(currentUserRaw);
+
+          if (
+            currentUser?.role === "student" &&
+            (matchesStudentKey(currentUser.id) ||
+              matchesStudentKey(currentUser.studentId))
+          ) {
+            localStorage.removeItem("currentUser");
+          }
+        }
+      } catch (error) {
+        console.error("Delete student cleanup error:", error);
+      }
 
       return {
         success: true,
       };
     },
-    [setStudents],
+    [students, setStudents],
+  );
+
+  // =========================
+  // ASSIGN STUDENT ID
+  // =========================
+
+  const assignStudentId = useCallback(
+    (id) => {
+      const student = students.find((item) => String(item.id) === String(id));
+
+      if (!student) {
+        return {
+          success: false,
+          message: "Student not found",
+        };
+      }
+
+      if (student.studentId) {
+        return {
+          success: false,
+          message: "Student already has a Student ID",
+        };
+      }
+
+      const studentId = generateStudentId();
+
+      setStudents((prevStudents) =>
+        prevStudents.map((item) =>
+          String(item.id) === String(id)
+            ? {
+                ...item,
+                studentId,
+                accountCreated: item.accountCreated || false,
+              }
+            : item,
+        ),
+      );
+
+      return {
+        success: true,
+        studentId,
+      };
+    },
+    [generateStudentId, students, setStudents],
   );
 
   // =========================
@@ -254,6 +384,7 @@ function useStudents() {
     getStudent,
     updateStudent,
     deleteStudent,
+    assignStudentId,
 
     addCourse,
     updateCourseGrade,

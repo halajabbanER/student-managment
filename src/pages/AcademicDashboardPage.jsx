@@ -182,13 +182,19 @@ function AcademicDashboardPage() {
           <div className="academic-grid">
             {academicSections.map((section) => {
               const SectionIcon = section.icon;
+              const handleSectionClick =
+                section.title === "Grades"
+                  ? () => navigate("/academic/grades")
+                  : section.title === "Schedules"
+                    ? () => navigate("/academic/schedules")
+                  : () => navigate(section.path);
 
               return (
                 <button
                   type="button"
                   className="academic-card"
                   key={section.title}
-                  onClick={() => navigate(section.path)}
+                  onClick={handleSectionClick}
                 >
                   <div className="academic-card-icon">
                     <SectionIcon aria-hidden="true" style={{ color: section.color }} />

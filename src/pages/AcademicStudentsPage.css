@@ -194,6 +194,10 @@
   background: #f59e0b;
 }
 
+.delete-student-btn {
+  background: #ef4444;
+}
+
 .academic-table-actions button:hover {
   opacity: 0.9;
 }

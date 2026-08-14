@@ -29,6 +29,16 @@ function CourseEnrollmentPage() {
     return course?.students || [];
   });
 
+  const department = departments.find(
+    (item) => String(item.id) === String(course?.departmentId),
+  );
+
+  const teacher = teachers.find(
+    (item) =>
+      String(item.id) === String(course?.teacherId) ||
+      String(item.teacherId) === String(course?.teacherId),
+  );
+
   const availableStudents = useMemo(() => {
     if (!course) {
       return [];
@@ -62,16 +72,6 @@ function CourseEnrollmentPage() {
       </div>
     );
   }
-
-  const department = departments.find(
-    (item) => String(item.id) === String(course.departmentId),
-  );
-
-  const teacher = teachers.find(
-    (item) =>
-      String(item.id) === String(course.teacherId) ||
-      String(item.teacherId) === String(course.teacherId),
-  );
 
   const handleToggleStudent = (student) => {
     const studentId = student.studentId || student.id;

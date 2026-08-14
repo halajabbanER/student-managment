@@ -1,0 +1,460 @@
+* {
+  box-sizing: border-box;
+}
+
+.student-document-page {
+  min-height: 100vh;
+
+  padding: 30px;
+
+  background: #eef0f5;
+}
+
+/* =========================
+   TOOLBAR
+========================= */
+
+.student-document-toolbar {
+  width: 100%;
+  max-width: 1000px;
+
+  margin: 0 auto 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+}
+
+.document-toolbar-actions {
+  display: flex;
+
+  gap: 10px;
+}
+
+.student-document-toolbar button {
+  padding: 10px 16px;
+
+  border: none;
+  border-radius: 9px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.25s;
+}
+
+.student-document-toolbar button:hover {
+  transform: translateY(-2px);
+}
+
+.document-back-btn {
+  background: white;
+
+  color: #374151;
+
+  border: 1px solid #d1d5db !important;
+}
+
+.document-print-btn {
+  background: #ffffff;
+
+  color: #4f46e5;
+
+  border: 1px solid #c7d2fe !important;
+}
+
+.document-download-btn {
+  background: #4f46e5;
+
+  color: white;
+
+  box-shadow:
+    0 7px 18px
+      rgba(79, 70, 229, 0.2);
+}
+
+/* =========================
+   DOCUMENT
+========================= */
+
+.student-document-wrapper {
+  display: flex;
+
+  justify-content: center;
+}
+
+.student-certificate {
+  width: 100%;
+  max-width: 850px;
+
+  min-height: 1100px;
+
+  padding: 55px 65px;
+
+  position: relative;
+
+  background: white;
+
+  border-radius: 4px;
+
+  box-shadow:
+    0 10px 35px
+      rgba(0, 0, 0, 0.1);
+
+  color: #1f2937;
+
+  font-family:
+    "Times New Roman",
+    serif;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.certificate-header {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+}
+
+.certificate-logo {
+  width: 60px;
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eef2ff;
+
+  font-size: 30px;
+}
+
+.certificate-header h2 {
+  margin: 0 0 5px;
+
+  color: #3730a3;
+
+  font-size: 23px;
+}
+
+.certificate-header p {
+  margin: 0;
+
+  color: #6b7280;
+}
+
+.certificate-divider {
+  height: 2px;
+
+  margin: 22px 0 30px;
+
+  background: #4f46e5;
+}
+
+/* =========================
+   TITLE
+========================= */
+
+.certificate-title {
+  margin-bottom: 30px;
+
+  text-align: center;
+}
+
+.certificate-title h1 {
+  margin: 0 0 7px;
+
+  font-size: 28px;
+
+  letter-spacing: 1px;
+}
+
+.certificate-title h2 {
+  margin: 0;
+
+  color: #6b7280;
+
+  font-size: 16px;
+  font-weight: 500;
+
+  letter-spacing: 2px;
+}
+
+/* =========================
+   DATE
+========================= */
+
+.certificate-date {
+  margin-bottom: 30px;
+
+  display: flex;
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  font-size: 14px;
+}
+
+.certificate-date span {
+  color: #6b7280;
+}
+
+/* =========================
+   DESCRIPTION
+========================= */
+
+.certificate-description {
+  margin: 0 0 10px;
+
+  text-align: justify;
+
+  line-height: 1.7;
+}
+
+.certificate-description.english {
+  margin-bottom: 30px;
+
+  color: #6b7280;
+}
+
+/* =========================
+   INFORMATION
+========================= */
+
+.certificate-information {
+  margin: 30px 0;
+}
+
+.certificate-row {
+  min-height: 55px;
+
+  padding: 12px 15px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(200px, 1fr)
+    minmax(200px, 1.5fr);
+
+  align-items: center;
+
+  gap: 20px;
+
+  border-bottom:
+    1px solid #e5e7eb;
+}
+
+.certificate-row:first-child {
+  border-top:
+    1px solid #e5e7eb;
+}
+
+.certificate-row span {
+  color: #6b7280;
+
+  font-size: 14px;
+}
+
+.certificate-row strong {
+  color: #111827;
+
+  font-size: 15px;
+}
+
+.certificate-active {
+  color: #16a34a !important;
+}
+
+/* =========================
+   CONFIRMATION
+========================= */
+
+.certificate-confirmation {
+  margin-top: 40px;
+
+  line-height: 1.7;
+
+  text-align: justify;
+}
+
+.certificate-confirmation p:last-child {
+  color: #6b7280;
+}
+
+/* =========================
+   SIGNATURE
+========================= */
+
+.certificate-signatures {
+  margin-top: 80px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 100px;
+
+  text-align: center;
+}
+
+.signature-line {
+  width: 100%;
+
+  margin-bottom: 10px;
+
+  border-top:
+    1px solid #6b7280;
+}
+
+.certificate-signatures strong,
+.certificate-signatures span {
+  display: block;
+}
+
+.certificate-signatures span {
+  margin-top: 4px;
+
+  color: #9ca3af;
+
+  font-size: 12px;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.certificate-footer {
+  position: absolute;
+
+  left: 65px;
+  right: 65px;
+  bottom: 40px;
+
+  padding-top: 15px;
+
+  text-align: center;
+
+  border-top:
+    1px solid #e5e7eb;
+
+  color: #9ca3af;
+
+  font-size: 11px;
+}
+
+.certificate-footer p {
+  margin: 3px 0;
+}
+
+/* =========================
+   NOT FOUND
+========================= */
+
+.document-not-found {
+  max-width: 500px;
+
+  margin: 100px auto;
+
+  padding: 40px;
+
+  text-align: center;
+
+  background: white;
+
+  border-radius: 15px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 700px) {
+  .student-document-page {
+    padding: 15px;
+  }
+
+  .student-document-toolbar {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .document-toolbar-actions {
+    width: 100%;
+  }
+
+  .document-toolbar-actions button {
+    flex: 1;
+  }
+
+  .student-certificate {
+    min-height: 950px;
+
+    padding: 30px 20px;
+  }
+
+  .certificate-row {
+    grid-template-columns: 1fr;
+
+    gap: 5px;
+  }
+
+  .certificate-signatures {
+    gap: 30px;
+  }
+
+  .certificate-footer {
+    left: 20px;
+    right: 20px;
+  }
+}
+
+/* =========================
+   PRINT
+========================= */
+
+@media print {
+  body {
+    margin: 0;
+
+    background: white;
+  }
+
+  .student-document-page {
+    padding: 0;
+
+    background: white;
+  }
+
+  .student-document-toolbar {
+    display: none;
+  }
+
+  .student-document-wrapper {
+    display: block;
+  }
+
+  .student-certificate {
+    width: 210mm;
+    max-width: none;
+
+    min-height: 297mm;
+
+    margin: 0;
+
+    padding: 20mm;
+
+    border-radius: 0;
+
+    box-shadow: none;
+  }
+}

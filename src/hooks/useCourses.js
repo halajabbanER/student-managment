@@ -74,6 +74,7 @@ function useCourses() {
           Number(course.id) === Number(id)
             ? {
                 ...course,
+                ...updatedData,
 
                 name: updatedData.name.trim(),
 
@@ -90,6 +91,10 @@ function useCourses() {
                 status: updatedData.status || "Active",
 
                 description: updatedData.description?.trim() || "",
+
+                exams: updatedData.exams ?? course.exams ?? [],
+
+                grades: updatedData.grades ?? course.grades ?? [],
               }
             : course,
         ),

@@ -7,7 +7,7 @@ import "./AcademicStudentsPage.css";
 function AcademicStudentsPage() {
   const navigate = useNavigate();
 
-  const { students, loading, assignStudentId } = useStudents();
+  const { students, loading, assignStudentId, deleteStudent } = useStudents();
 
   const handleGenerateId = (studentId) => {
     const result = assignStudentId(studentId);
@@ -18,6 +18,22 @@ function AcademicStudentsPage() {
     }
 
     alert(`Student ID generated successfully: ${result.studentId}`);
+  };
+
+  const handleDeleteStudent = (student) => {
+    const confirmDelete = window.confirm(
+      `Delete ${student.name} from the system? This will remove the student, enrollments, and grades.`,
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    const result = deleteStudent(student.id);
+
+    if (!result.success) {
+      alert(result.message || "Failed to delete student.");
+    }
   };
 
   if (loading) {
@@ -128,6 +144,14 @@ function AcademicStudentsPage() {
                         onClick={() => navigate(`/student/edit/${student.id}`)}
                       >
                         Edit
+                      </button>
+
+                      <button
+                        type="button"
+                        className="delete-student-btn"
+                        onClick={() => handleDeleteStudent(student)}
+                      >
+                        Delete
                       </button>
                     </div>
                   </td>

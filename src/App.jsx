@@ -21,14 +21,18 @@ import AcademicStudentsPage from "./pages/AcademicStudentsPage";
 import AcademicTeachersPage from "./pages/AcademicTeachersPage";
 import AcademicDepartmentsPage from "./pages/AcademicDepartmentsPage";
 import AcademicCoursesPage from "./pages/AcademicCoursesPage";
+import AcademicExamsPage from "./pages/AcademicExamsPage";
 import CourseEnrollmentPage from "./pages/CourseEnrollmentPage";
 
 /* Student */
 import StudentPortalPage from "./pages/StudentPortalPage";
-
+import StudentDocumentPage from "./pages/StudentDocumentPage";
 /* Teacher */
 import TeacherPortalPage from "./pages/TeacherPortalPage";
-
+import TeacherCourseStudentsPage from "./pages/TeacherCourseStudentsPage";
+import TeacherExamsPage from "./pages/TeacherExamsPage";
+import AcademicGradesPage from "./pages/AcademicGradesPage";
+import AcademicSchedulesPage from "./pages/AcademicSchedulesPage";
 /* Other */
 import NotFoundPage from "./pages/NotFoundPage";
 
@@ -61,6 +65,14 @@ function App() {
           </RoleRoute>
         }
       />
+      <Route
+        path="/student/:id/document"
+        element={
+          <RoleRoute allowedRoles={["admin", "academic", "student"]}>
+            <StudentDocumentPage />
+          </RoleRoute>
+        }
+      />
 
       {/* TEACHER */}
 
@@ -69,6 +81,49 @@ function App() {
         element={
           <RoleRoute allowedRoles={["teacher"]}>
             <TeacherPortalPage />
+          </RoleRoute>
+        }
+      />
+
+      <Route
+        path="/teacher/course/:id/students"
+        element={
+          <RoleRoute allowedRoles={["teacher"]}>
+            <TeacherCourseStudentsPage />
+          </RoleRoute>
+        }
+      />
+
+      <Route
+        path="/teacher/course/:id/grades"
+        element={
+          <RoleRoute allowedRoles={["teacher"]}>
+            <TeacherCourseStudentsPage />
+          </RoleRoute>
+        }
+      />
+      <Route
+        path="/teacher/course/:id/exams"
+        element={
+          <RoleRoute allowedRoles={["teacher"]}>
+            <TeacherExamsPage />
+          </RoleRoute>
+        }
+      />
+      <Route
+        path="/academic/grades"
+        element={
+          <RoleRoute allowedRoles={["academic"]}>
+            <AcademicGradesPage />
+          </RoleRoute>
+        }
+      />
+
+      <Route
+        path="/academic/schedules"
+        element={
+          <RoleRoute allowedRoles={["academic"]}>
+            <AcademicSchedulesPage />
           </RoleRoute>
         }
       />
@@ -125,6 +180,15 @@ function App() {
         element={
           <RoleRoute allowedRoles={["academic"]}>
             <CourseEnrollmentPage />
+          </RoleRoute>
+        }
+      />
+
+      <Route
+        path="/academic/exams"
+        element={
+          <RoleRoute allowedRoles={["academic"]}>
+            <AcademicExamsPage />
           </RoleRoute>
         }
       />

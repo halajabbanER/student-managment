@@ -31,6 +31,22 @@ const DEFAULT_ACADEMIC_ACCOUNT = {
   role: "academic",
 };
 
+const DEFAULT_STUDENT_ACCOUNT = {
+  id: 20032003,
+  name: "Demo Student",
+  studentId: "20032003",
+  email: "student@hala.com",
+  password: "Student123",
+  department: "Computer Engineering",
+  level: "1st Year",
+  status: "Active",
+  role: "student",
+  accountCreated: true,
+  courses: [],
+  exams: [],
+  schedule: [],
+};
+
 
 
 export function AuthProvider({ children }) {
