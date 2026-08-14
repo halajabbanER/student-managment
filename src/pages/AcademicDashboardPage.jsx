@@ -8,7 +8,9 @@ import {
   FaChartColumn,
   FaChalkboardUser,
   FaFlaskVial,
+  FaMoon,
   FaUserGraduate,
+  FaSun,
 } from "react-icons/fa6";
 
 import useAuth from "../hooks/useAuth";
@@ -57,6 +59,22 @@ function AcademicDashboardPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { students } = useStudents();
+  const [darkMode, setDarkMode] = useState(() => {
+    try {
+      return localStorage.getItem("theme") === "dark";
+    } catch (error) {
+      console.error("theme storage error:", error);
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+  }, [darkMode]);
 
   const teachers = safeReadList("teachers");
   const departments = safeReadList("departments");
@@ -126,6 +144,18 @@ function AcademicDashboardPage() {
     navigate("/login", { replace: true });
   };
 
+  const toggleTheme = () => {
+    const nextMode = !darkMode;
+
+    setDarkMode(nextMode);
+
+    try {
+      localStorage.setItem("theme", nextMode ? "dark" : "light");
+    } catch (error) {
+      console.error("theme storage error:", error);
+    }
+  };
+
   return (
     <div className="academic-page">
       <header className="academic-header">
@@ -137,6 +167,15 @@ function AcademicDashboardPage() {
           <span>
             Welcome, <strong>{user?.name}</strong>
           </span>
+
+          <button
+            type="button"
+            className="academic-theme-btn"
+            onClick={toggleTheme}
+            title={darkMode ? "Light Mode" : "Dark Mode"}
+          >
+            {darkMode ? <FaSun aria-hidden="true" /> : <FaMoon aria-hidden="true" />}
+          </button>
 
           <button type="button" onClick={handleLogout}>
             Logout
@@ -151,7 +190,7 @@ function AcademicDashboardPage() {
             <p>Manage students, teachers, courses, exams, grades and schedules.</p>
           </div>
 
-          <span className="academic-role">Academic Staff</span>
+          <span className="academic-role">Academic </span>
         </div>
 
         <div className="academic-stats">

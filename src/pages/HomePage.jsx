@@ -156,9 +156,7 @@ function HomePage() {
           </div>
 
           <div className="header-actions">
-            <button className="header-secondary" onClick={() => navigate("/academic")}>
-              Academic
-            </button>
+          
             <button className="header-primary" onClick={() => navigate("/student/new")}>
               <FaUserPlus />
               Add Student

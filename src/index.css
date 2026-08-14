@@ -1,4 +1,4 @@
-html,
+﻿html,
 body,
 #root {
   width: 100%;
@@ -60,20 +60,6 @@ body.dark-mode .error-container {
   color: #f9fafb;
 
   border-color: #374151;
-}
-
-/* Text */
-
-body.dark-mode h1,
-body.dark-mode h2,
-body.dark-mode h3,
-body.dark-mode strong,
-body.dark-mode label {
-  color: #f9fafb;
-}
-
-body.dark-mode p {
-  color: #cbd5e1;
 }
 
 /* Inputs */
@@ -141,3 +127,333 @@ body.dark-mode footer {
 
   color: #d1d5db;
 }
+
+/* =========================
+   Global Dark Pages
+========================= */
+
+body.dark-mode .app-shell,
+body.dark-mode .app-content {
+  background: #111827;
+}
+
+body.dark-mode .academic-page,
+body.dark-mode .academic-students-page,
+body.dark-mode .academic-teachers-page,
+body.dark-mode .academic-departments-page,
+body.dark-mode .academic-courses-page,
+body.dark-mode .academic-exams-page,
+body.dark-mode .academic-grades-page,
+body.dark-mode .academic-schedules-page,
+body.dark-mode .student-portal-page,
+body.dark-mode .teacher-portal-page,
+body.dark-mode .student-document-page,
+body.dark-mode .roles-page,
+body.dark-mode .not-found-page,
+body.dark-mode .auth-page,
+body.dark-mode .error-boundary {
+  background: #111827;
+  color: #e5e7eb;
+}
+
+body.dark-mode .dashboard-shell,
+body.dark-mode .dashboard-main,
+body.dark-mode .student-profile,
+body.dark-mode .student-courses-section,
+body.dark-mode .student-portal-menu,
+body.dark-mode .student-menu-card,
+body.dark-mode .roles-grid,
+body.dark-mode .roles-summary {
+  background: transparent;
+  color: #e5e7eb;
+}
+
+body.dark-mode .auth-page {
+  background:
+    linear-gradient(rgba(3, 7, 18, 0.78), rgba(17, 24, 39, 0.72)),
+    url("./assets/student-bg.png.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+body.dark-mode .not-found-card,
+body.dark-mode .auth-card,
+body.dark-mode .error-boundary-card,
+body.dark-mode .roles-hero,
+body.dark-mode .role-card,
+body.dark-mode .action-card,
+body.dark-mode .student-document-wrapper,
+body.dark-mode .student-certificate,
+body.dark-mode .student-details-card,
+body.dark-mode .student-form-page form,
+body.dark-mode .student-card,
+body.dark-mode .student-filters,
+body.dark-mode .no-students,
+body.dark-mode .dashboard-sidebar,
+body.dark-mode .panel,
+body.dark-mode .sidebar-card,
+body.dark-mode .quick-card,
+body.dark-mode .summary-card,
+body.dark-mode .academic-header,
+body.dark-mode .academic-title,
+body.dark-mode .academic-stat-card,
+body.dark-mode .academic-management,
+body.dark-mode .academic-card,
+body.dark-mode .academic-students-table-wrapper,
+body.dark-mode .academic-empty,
+body.dark-mode .teachers-table-wrapper,
+body.dark-mode .teachers-empty,
+body.dark-mode .teacher-form,
+body.dark-mode .teacher-portal-header,
+body.dark-mode .teacher-profile-section,
+body.dark-mode .teacher-stat-card,
+body.dark-mode .teacher-course-card,
+body.dark-mode .teacher-empty-courses,
+body.dark-mode .student-portal-header,
+body.dark-mode .student-profile,
+body.dark-mode .student-stat-card,
+body.dark-mode .student-course-card,
+body.dark-mode .student-empty-courses,
+body.dark-mode .academic-schedule-form,
+body.dark-mode .schedule-day-card,
+body.dark-mode .schedule-empty,
+body.dark-mode .schedule-class-card,
+body.dark-mode .academic-grades-tools,
+body.dark-mode .academic-grade-stat,
+body.dark-mode .academic-exam-form,
+body.dark-mode .academic-exams-list,
+body.dark-mode .academic-exam-card,
+body.dark-mode .academic-exams-empty,
+body.dark-mode .department-form,
+body.dark-mode .department-card,
+body.dark-mode .departments-search,
+body.dark-mode .department-count,
+body.dark-mode .departments-empty,
+body.dark-mode .course-form,
+body.dark-mode .course-management-card,
+body.dark-mode .courses-search,
+body.dark-mode .courses-total,
+body.dark-mode .courses-empty,
+body.dark-mode .enrollment-course-info,
+body.dark-mode .enrollment-toolbar,
+body.dark-mode .enrollment-students-grid,
+body.dark-mode .enrollment-student-card,
+body.dark-mode .enrollment-empty,
+body.dark-mode .teacher-portal-error,
+body.dark-mode .error-container {
+  background: #1f2937;
+  color: #e5e7eb;
+  border-color: #374151;
+}
+
+body.dark-mode .dashboard-header,
+body.dark-mode .top-controls,
+body.dark-mode .tab-row,
+body.dark-mode .panel-head,
+body.dark-mode .panel-footer,
+body.dark-mode .student-section-title,
+body.dark-mode .teacher-section-title,
+body.dark-mode .academic-section-title,
+body.dark-mode .schedule-section-header,
+body.dark-mode .courses-page-header,
+body.dark-mode .departments-header,
+body.dark-mode .teachers-page-header,
+body.dark-mode .academic-grades-header,
+body.dark-mode .academic-exams-header,
+body.dark-mode .academic-schedules-header,
+body.dark-mode .student-portal-header,
+body.dark-mode .teacher-portal-header,
+body.dark-mode .roles-hero {
+  background: #1f2937;
+  color: #e5e7eb;
+  border-color: #374151;
+}
+
+body.dark-mode .academic-header,
+body.dark-mode .teacher-portal-header,
+body.dark-mode .student-portal-header,
+body.dark-mode .roles-hero {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+}
+
+body.dark-mode .academic-card,
+body.dark-mode .teacher-course-card,
+body.dark-mode .student-course-card,
+body.dark-mode .department-card,
+body.dark-mode .course-management-card,
+body.dark-mode .academic-exam-card,
+body.dark-mode .schedule-class-card,
+body.dark-mode .enrollment-student-card,
+body.dark-mode .student-stat-card,
+body.dark-mode .mini-stat,
+body.dark-mode .task-item,
+body.dark-mode .student-menu-card,
+body.dark-mode .department-form,
+body.dark-mode .course-form,
+body.dark-mode .teacher-form,
+body.dark-mode .academic-grade-stat,
+body.dark-mode .academic-exams-list,
+body.dark-mode .academic-exam-form,
+body.dark-mode .academic-grades-tools,
+body.dark-mode .departments-search,
+body.dark-mode .courses-search,
+body.dark-mode .tab,
+body.dark-mode .search-bar,
+body.dark-mode .summary-tags span,
+body.dark-mode .roles-summary {
+  border-color: #374151;
+}
+
+body.dark-mode .academic-card h3,
+body.dark-mode .academic-card p,
+body.dark-mode .teacher-course-card h3,
+body.dark-mode .teacher-course-card p,
+body.dark-mode .student-course-card h3,
+body.dark-mode .student-course-card p,
+body.dark-mode .department-card h3,
+body.dark-mode .department-card p,
+body.dark-mode .course-management-card h3,
+body.dark-mode .course-management-card p,
+body.dark-mode .academic-exam-card h3,
+body.dark-mode .academic-exam-card p,
+body.dark-mode .schedule-class-card h4,
+body.dark-mode .schedule-class-card p,
+body.dark-mode .enrollment-student-card h3,
+body.dark-mode .enrollment-student-card p,
+body.dark-mode .role-card h3,
+body.dark-mode .role-card p {
+  color: #e5e7eb;
+}
+
+body.dark-mode .dashboard-header h1,
+body.dark-mode .dashboard-header p,
+body.dark-mode .student-profile-info h1,
+body.dark-mode .student-profile-info p,
+body.dark-mode .student-portal-header h2,
+body.dark-mode .student-portal-header p,
+body.dark-mode .teacher-portal-header h2,
+body.dark-mode .teacher-portal-header p,
+body.dark-mode .roles-hero h1,
+body.dark-mode .roles-hero p,
+body.dark-mode .student-menu-card h3,
+body.dark-mode .student-menu-card p,
+body.dark-mode .task-copy strong,
+body.dark-mode .task-copy span,
+body.dark-mode .mini-stat-copy span,
+body.dark-mode .panel-kicker,
+body.dark-mode .panel-footer p,
+body.dark-mode .footer-row,
+body.dark-mode .summary-tags span {
+  color: #e5e7eb;
+}
+
+body.dark-mode .academic-card-icon,
+body.dark-mode .teacher-course-icon,
+body.dark-mode .student-course-icon,
+body.dark-mode .role-icon,
+body.dark-mode .student-document-btn,
+body.dark-mode .average-badge,
+body.dark-mode .student-id-badge,
+body.dark-mode .teacher-id-badge,
+body.dark-mode .details-student-id,
+body.dark-mode .grade-badge,
+body.dark-mode .schedule-course-code {
+  box-shadow: none;
+}
+
+body.dark-mode .academic-schedules-header > button,
+body.dark-mode .schedule-cancel-edit,
+body.dark-mode .course-edit-btn,
+body.dark-mode .department-edit-btn,
+body.dark-mode .edit-btn,
+body.dark-mode .back-btn,
+body.dark-mode .back-students-btn,
+body.dark-mode .edit-student-btn,
+body.dark-mode .teacher-view-students-btn,
+body.dark-mode .teacher-grades-btn,
+body.dark-mode .teacher-course-actions button,
+body.dark-mode .academic-user button,
+body.dark-mode .logout-btn {
+  background: #111827;
+  color: #e5e7eb;
+  border-color: #374151;
+}
+
+body.dark-mode .schedule-edit-btn {
+  background: #3730a3;
+  color: #e5e7eb;
+}
+
+body.dark-mode .schedule-delete-btn,
+body.dark-mode .delete-btn,
+body.dark-mode .delete-course-btn,
+body.dark-mode .delete-student-btn {
+  background: #7f1d1d;
+  color: #fecaca;
+}
+
+body.dark-mode .schedule-form-group input,
+body.dark-mode .schedule-form-group select,
+body.dark-mode .auth-card input,
+body.dark-mode .auth-card select {
+  background: #111827;
+  color: #e5e7eb;
+  border-color: #374151;
+}
+
+body.dark-mode .student-document-page .certificate-footer,
+body.dark-mode .student-document-page .certificate-confirmation,
+body.dark-mode .student-document-page .certificate-information,
+body.dark-mode .student-document-page .certificate-signatures,
+body.dark-mode .student-document-page .certificate-row,
+body.dark-mode .student-document-page .certificate-header,
+body.dark-mode .student-document-page .certificate-divider {
+  color: #e5e7eb;
+  border-color: #374151;
+}
+
+body.dark-mode .student-document-page .certificate-row span,
+body.dark-mode .student-document-page .certificate-footer p,
+body.dark-mode .student-document-page .certificate-confirmation p,
+body.dark-mode .student-document-page .certificate-description {
+  color: #cbd5e1;
+}
+
+body.dark-mode .student-document-page .student-certificate {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+body.dark-mode .not-found-card h1,
+body.dark-mode .not-found-card h2,
+body.dark-mode .auth-card h1,
+body.dark-mode .error-boundary h1,
+body.dark-mode .error-boundary h2 {
+  color: #f9fafb;
+}
+
+body.dark-mode .not-found-card p,
+body.dark-mode .auth-card p,
+body.dark-mode .error-boundary p,
+body.dark-mode .roles-hero p,
+body.dark-mode .roles-card p,
+body.dark-mode .academic-title p,
+body.dark-mode .academic-section-title p,
+body.dark-mode .teacher-section-title p,
+body.dark-mode .student-section-title p {
+  color: #cbd5e1;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+

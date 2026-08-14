@@ -44,12 +44,6 @@ function Header() {
         🎓 Student Management
       </Link>
 
-      <nav className="header-nav">
-        <Link to="/">Dashboard</Link>
-
-        <Link to="/students">Students</Link>
-      </nav>
-
       <div className="header-user">
         {user && (
           <span>

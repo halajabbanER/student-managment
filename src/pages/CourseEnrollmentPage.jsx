@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import useCourses from "../hooks/useCourses";
@@ -24,20 +24,35 @@ function CourseEnrollmentPage() {
   const course = getCourse(id);
 
   const [searchTerm, setSearchTerm] = useState("");
-
   const [selectedStudents, setSelectedStudents] = useState(() => {
     return course?.students || [];
   });
 
-  const department = departments.find(
-    (item) => String(item.id) === String(course?.departmentId),
-  );
+  // =========================
+  // DEPARTMENT
+  // =========================
 
-  const teacher = teachers.find(
-    (item) =>
-      String(item.id) === String(course?.teacherId) ||
-      String(item.teacherId) === String(course?.teacherId),
-  );
+  const department = course
+    ? departments.find((item) => String(item.id) === String(course.departmentId))
+    : null;
+
+  // =========================
+  // TEACHER
+  // =========================
+
+  const teacher = course
+    ? teachers.find(
+        (item) =>
+          String(item.id) === String(course.teacherId) ||
+          String(item.teacherId) === String(course.teacherId),
+      )
+    : null;
+
+  // =========================
+  // AVAILABLE STUDENTS
+  // =========================
+  // هنا نعرض كل الطلاب
+  // بدون فلترة حسب القسم
 
   const availableStudents = useMemo(() => {
     if (!course) {
@@ -47,17 +62,25 @@ function CourseEnrollmentPage() {
     const search = searchTerm.trim().toLowerCase();
 
     return students.filter((student) => {
-      const sameDepartment =
-        !department || student.department === department.name;
+      const studentName = student.name?.toLowerCase() || "";
+
+      const studentId = String(student.studentId || student.id).toLowerCase();
+
+      const studentEmail = student.email?.toLowerCase() || "";
 
       const matchesSearch =
         !search ||
-        student.name?.toLowerCase().includes(search) ||
-        String(student.studentId || student.id).includes(search);
+        studentName.includes(search) ||
+        studentId.includes(search) ||
+        studentEmail.includes(search);
 
-      return sameDepartment && matchesSearch;
+      return matchesSearch;
     });
-  }, [students, searchTerm, department, course]);
+  }, [students, searchTerm, course]);
+
+  // =========================
+  // COURSE NOT FOUND
+  // =========================
 
   if (!course) {
     return (
@@ -72,6 +95,10 @@ function CourseEnrollmentPage() {
       </div>
     );
   }
+
+  // =========================
+  // SELECT / UNSELECT STUDENT
+  // =========================
 
   const handleToggleStudent = (student) => {
     const studentId = student.studentId || student.id;
@@ -91,23 +118,43 @@ function CourseEnrollmentPage() {
     setSelectedStudents((prevStudents) => [...prevStudents, studentId]);
   };
 
+  // =========================
+  // SELECT ALL
+  // =========================
+
   const handleSelectAll = () => {
-    const allStudentIds = availableStudents.map(
+    const visibleStudentIds = availableStudents.map(
       (student) => student.studentId || student.id,
     );
 
-    setSelectedStudents(allStudentIds);
+    setSelectedStudents((prevStudents) => {
+      const combined = [...prevStudents, ...visibleStudentIds];
+
+      return [
+        ...new Map(
+          combined.map((studentId) => [String(studentId), studentId]),
+        ).values(),
+      ];
+    });
   };
+
+  // =========================
+  // CLEAR ALL
+  // =========================
 
   const handleClearAll = () => {
     setSelectedStudents([]);
   };
 
+  // =========================
+  // SAVE
+  // =========================
+
   const handleSave = () => {
     const result = setCourseStudents(course.id, selectedStudents);
 
     if (!result.success) {
-      alert("Failed to save enrollment.");
+      alert(result.message || "Failed to save enrollment.");
 
       return;
     }
@@ -119,6 +166,10 @@ function CourseEnrollmentPage() {
 
   return (
     <div className="course-enrollment-page">
+      {/* =====================
+          HEADER
+      ====================== */}
+
       <div className="enrollment-header">
         <div>
           <span className="enrollment-course-code">{course.code}</span>
@@ -131,6 +182,7 @@ function CourseEnrollmentPage() {
         </div>
 
         <button
+          type="button"
           className="enrollment-back-btn"
           onClick={() => navigate("/academic/courses")}
         >
@@ -138,27 +190,39 @@ function CourseEnrollmentPage() {
         </button>
       </div>
 
+      {/* =====================
+          COURSE INFO
+      ====================== */}
+
       <div className="enrollment-course-info">
         <div>
           <span>Course</span>
+
           <strong>{course.name}</strong>
         </div>
 
         <div>
           <span>Department</span>
-          <strong>{department?.name || "-"}</strong>
+
+          <strong>{department?.name || course.department || "-"}</strong>
         </div>
 
         <div>
           <span>Teacher</span>
+
           <strong>{teacher?.name || "Not Assigned"}</strong>
         </div>
 
         <div>
           <span>Enrolled</span>
+
           <strong>{selectedStudents.length}</strong>
         </div>
       </div>
+
+      {/* =====================
+          SEARCH + ACTIONS
+      ====================== */}
 
       <div className="enrollment-toolbar">
         <div className="enrollment-search">
@@ -166,7 +230,7 @@ function CourseEnrollmentPage() {
 
           <input
             type="text"
-            placeholder="Search student name or ID..."
+            placeholder="Search student name, ID or email..."
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
           />
@@ -183,6 +247,10 @@ function CourseEnrollmentPage() {
         </div>
       </div>
 
+      {/* =====================
+          STUDENTS
+      ====================== */}
+
       {availableStudents.length > 0 ? (
         <div className="enrollment-students-grid">
           {availableStudents.map((student) => {
@@ -191,6 +259,15 @@ function CourseEnrollmentPage() {
             const selected = selectedStudents.some(
               (id) => String(id) === String(studentId),
             );
+
+            const initials =
+              student.name
+                ?.split(" ")
+                .filter(Boolean)
+                .map((word) => word[0])
+                .slice(0, 2)
+                .join("")
+                .toUpperCase() || "ST";
 
             return (
               <button
@@ -201,16 +278,15 @@ function CourseEnrollmentPage() {
                 key={student.id}
                 onClick={() => handleToggleStudent(student)}
               >
+                {/* CHECKBOX */}
+
                 <div className="enrollment-checkbox">{selected ? "✓" : ""}</div>
 
-                <div className="enrollment-student-avatar">
-                  {student.name
-                    ?.split(" ")
-                    .map((word) => word[0])
-                    .slice(0, 2)
-                    .join("")
-                    .toUpperCase()}
-                </div>
+                {/* AVATAR */}
+
+                <div className="enrollment-student-avatar">{initials}</div>
+
+                {/* INFORMATION */}
 
                 <div className="enrollment-student-info">
                   <h3>{student.name}</h3>
@@ -218,6 +294,10 @@ function CourseEnrollmentPage() {
                   <p>
                     Student ID:{" "}
                     <strong>{student.studentId || student.id}</strong>
+                  </p>
+
+                  <p>
+                    Department: <strong>{student.department || "-"}</strong>
                   </p>
 
                   <span>{student.level || "-"}</span>
@@ -228,11 +308,28 @@ function CourseEnrollmentPage() {
         </div>
       ) : (
         <div className="enrollment-empty">
+          <div
+            style={{
+              fontSize: "45px",
+              marginBottom: "10px",
+            }}
+          >
+            👨‍🎓
+          </div>
+
           <h2>No students found</h2>
 
-          <p>There are no matching students for this course department.</p>
+          <p>
+            {students.length === 0
+              ? "There are no students in the system yet."
+              : "No students match your search."}
+          </p>
         </div>
       )}
+
+      {/* =====================
+          FOOTER
+      ====================== */}
 
       <div className="enrollment-footer">
         <div>
@@ -262,3 +359,4 @@ function CourseEnrollmentPage() {
 }
 
 export default CourseEnrollmentPage;
+

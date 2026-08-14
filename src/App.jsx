@@ -38,208 +38,215 @@ import NotFoundPage from "./pages/NotFoundPage";
 
 /* Components */
 import MainLayout from "./components/common/MainLayout";
+import Footer from "./components/common/Footer";
 import RoleRoute from "./components/auth/RoleRoute";
 
 function App() {
   return (
-    <Routes>
-      {/* PUBLIC */}
+    <div className="app-shell">
+      <div className="app-content">
+        <Routes>
+          {/* PUBLIC */}
 
-      <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
 
-      <Route path="/register" element={<RegisterPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
-      <Route path="/academic-register" element={<AcademicRegisterPage />} />
+          <Route path="/academic-register" element={<AcademicRegisterPage />} />
 
-      <Route path="/teacher-register" element={<TeacherRegisterPage />} />
+          <Route path="/teacher-register" element={<TeacherRegisterPage />} />
 
-      <Route path="/admin-login" element={<AdminLoginPage />} />
+          <Route path="/admin-login" element={<AdminLoginPage />} />
 
-      {/* STUDENT */}
+          {/* STUDENT */}
 
-      <Route
-        path="/student-portal"
-        element={
-          <RoleRoute allowedRoles={["student"]}>
-            <StudentPortalPage />
-          </RoleRoute>
-        }
-      />
-      <Route
-        path="/student/:id/document"
-        element={
-          <RoleRoute allowedRoles={["admin", "academic", "student"]}>
-            <StudentDocumentPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/student-portal"
+            element={
+              <RoleRoute allowedRoles={["student"]}>
+                <StudentPortalPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/student/:id/document"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic", "student"]}>
+                <StudentDocumentPage />
+              </RoleRoute>
+            }
+          />
 
-      {/* TEACHER */}
+          {/* TEACHER */}
 
-      <Route
-        path="/teacher-portal"
-        element={
-          <RoleRoute allowedRoles={["teacher"]}>
-            <TeacherPortalPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/teacher-portal"
+            element={
+              <RoleRoute allowedRoles={["teacher"]}>
+                <TeacherPortalPage />
+              </RoleRoute>
+            }
+          />
 
-      <Route
-        path="/teacher/course/:id/students"
-        element={
-          <RoleRoute allowedRoles={["teacher"]}>
-            <TeacherCourseStudentsPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/teacher/course/:id/students"
+            element={
+              <RoleRoute allowedRoles={["teacher"]}>
+                <TeacherCourseStudentsPage />
+              </RoleRoute>
+            }
+          />
 
-      <Route
-        path="/teacher/course/:id/grades"
-        element={
-          <RoleRoute allowedRoles={["teacher"]}>
-            <TeacherCourseStudentsPage />
-          </RoleRoute>
-        }
-      />
-      <Route
-        path="/teacher/course/:id/exams"
-        element={
-          <RoleRoute allowedRoles={["teacher"]}>
-            <TeacherExamsPage />
-          </RoleRoute>
-        }
-      />
-      <Route
-        path="/academic/grades"
-        element={
-          <RoleRoute allowedRoles={["academic"]}>
-            <AcademicGradesPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/teacher/course/:id/grades"
+            element={
+              <RoleRoute allowedRoles={["teacher"]}>
+                <TeacherCourseStudentsPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/teacher/course/:id/exams"
+            element={
+              <RoleRoute allowedRoles={["teacher"]}>
+                <TeacherExamsPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/academic/grades"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <AcademicGradesPage />
+              </RoleRoute>
+            }
+          />
 
-      <Route
-        path="/academic/schedules"
-        element={
-          <RoleRoute allowedRoles={["academic"]}>
-            <AcademicSchedulesPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/academic/schedules"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <AcademicSchedulesPage />
+              </RoleRoute>
+            }
+          />
 
-      {/* ACADEMIC */}
+          {/* ACADEMIC */}
 
-      <Route
-        path="/academic"
-        element={
-          <RoleRoute allowedRoles={["academic"]}>
-            <AcademicDashboardPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/academic"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <AcademicDashboardPage />
+              </RoleRoute>
+            }
+          />
 
-      <Route
-        path="/academic/students"
-        element={
-          <RoleRoute allowedRoles={["academic"]}>
-            <AcademicStudentsPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/academic/students"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <AcademicStudentsPage />
+              </RoleRoute>
+            }
+          />
 
-      <Route
-        path="/academic/teachers"
-        element={
-          <RoleRoute allowedRoles={["academic"]}>
-            <AcademicTeachersPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/academic/teachers"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <AcademicTeachersPage />
+              </RoleRoute>
+            }
+          />
 
-      <Route
-        path="/academic/departments"
-        element={
-          <RoleRoute allowedRoles={["academic"]}>
-            <AcademicDepartmentsPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/academic/departments"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <AcademicDepartmentsPage />
+              </RoleRoute>
+            }
+          />
 
-      <Route
-        path="/academic/courses"
-        element={
-          <RoleRoute allowedRoles={["academic"]}>
-            <AcademicCoursesPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/academic/courses"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <AcademicCoursesPage />
+              </RoleRoute>
+            }
+          />
 
-      <Route
-        path="/academic/courses/:id/enrollment"
-        element={
-          <RoleRoute allowedRoles={["academic"]}>
-            <CourseEnrollmentPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/academic/courses/:id/enrollment"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <CourseEnrollmentPage />
+              </RoleRoute>
+            }
+          />
 
-      <Route
-        path="/academic/exams"
-        element={
-          <RoleRoute allowedRoles={["academic"]}>
-            <AcademicExamsPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/academic/exams"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <AcademicExamsPage />
+              </RoleRoute>
+            }
+          />
 
-      {/* ADMIN + ACADEMIC */}
+          {/* ADMIN + ACADEMIC */}
 
-      <Route
-        path="/student/new"
-        element={
-          <RoleRoute allowedRoles={["admin", "academic"]}>
-            <AddStudentPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/student/new"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <AddStudentPage />
+              </RoleRoute>
+            }
+          />
 
-      <Route
-        path="/student/:id"
-        element={
-          <RoleRoute allowedRoles={["admin", "academic"]}>
-            <StudentDetailsPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/student/:id"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <StudentDetailsPage />
+              </RoleRoute>
+            }
+          />
 
-      <Route
-        path="/student/edit/:id"
-        element={
-          <RoleRoute allowedRoles={["admin", "academic"]}>
-            <StudentFormPage />
-          </RoleRoute>
-        }
-      />
+          <Route
+            path="/student/edit/:id"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <StudentFormPage />
+              </RoleRoute>
+            }
+          />
 
-      {/* ADMIN */}
+          {/* ADMIN */}
 
-      <Route
-        element={
-          <RoleRoute allowedRoles={["admin"]}>
-            <MainLayout />
-          </RoleRoute>
-        }
-      >
-        <Route path="/" element={<HomePage />} />
+          <Route
+            element={
+              <RoleRoute allowedRoles={["admin"]}>
+                <MainLayout />
+              </RoleRoute>
+            }
+          >
+            <Route path="/" element={<HomePage />} />
 
-        <Route path="/students" element={<StudentsPage />} />
-      </Route>
+            <Route path="/students" element={<StudentsPage />} />
+          </Route>
 
-      {/* 404 */}
+          {/* 404 */}
 
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </div>
+
+      <Footer />
+    </div>
   );
 }
 

@@ -21,7 +21,7 @@ function AcademicSchedulesPage() {
   });
 
   const [error, setError] = useState("");
-  const [editingId, setEditingId] = useState(null);
+  const [editingTarget, setEditingTarget] = useState(null);
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
@@ -45,8 +45,9 @@ function AcademicSchedulesPage() {
 
   const allSchedules = useMemo(() => {
     return courses.flatMap((course) =>
-      (course.schedule || []).map((schedule) => ({
+      (course.schedule || []).map((schedule, scheduleIndex) => ({
         ...schedule,
+        scheduleTarget: `${course.id}:${scheduleIndex}`,
 
         courseId: course.id,
         courseName: course.name,
@@ -85,7 +86,7 @@ function AcademicSchedulesPage() {
       room: "",
     });
 
-    setEditingId(null);
+    setEditingTarget(null);
     setError("");
   };
 
@@ -131,10 +132,12 @@ function AcademicSchedulesPage() {
     }
 
     // EDIT
-    if (editingId) {
-      const updatedSchedule = (course.schedule || []).map((item) =>
-        String(item.id) === String(editingId)
+    if (editingTarget) {
+      const updatedSchedule = (course.schedule || []).map((item, itemIndex) =>
+        `${course.id}:${itemIndex}` === editingTarget
           ? {
+              id: item.id ?? Date.now(),
+
               ...item,
 
               day: formData.day,
@@ -198,7 +201,7 @@ function AcademicSchedulesPage() {
   // =========================
 
   const handleEdit = (schedule) => {
-    setEditingId(schedule.id);
+    setEditingTarget(schedule.scheduleTarget);
 
     setFormData({
       courseId: String(schedule.courseId),
@@ -240,7 +243,7 @@ function AcademicSchedulesPage() {
     }
 
     const updatedSchedule = (course.schedule || []).filter(
-      (item) => String(item.id) !== String(schedule.id),
+      (item, itemIndex) => `${course.id}:${itemIndex}` !== schedule.scheduleTarget,
     );
 
     updateCourse(course.id, {
@@ -249,7 +252,7 @@ function AcademicSchedulesPage() {
       schedule: updatedSchedule,
     });
 
-    if (String(editingId) === String(schedule.id)) {
+    if (String(editingTarget) === String(schedule.scheduleTarget)) {
       resetForm();
     }
   };
@@ -275,12 +278,12 @@ function AcademicSchedulesPage() {
       <form className="academic-schedule-form" onSubmit={handleSubmit}>
         <div className="schedule-form-title">
           <div>
-            <h2>{editingId ? "Edit Schedule" : "Add Schedule"}</h2>
+          <h2>{editingTarget ? "Edit Schedule" : "Add Schedule"}</h2>
 
             <p>Assign a course to a day, time and classroom.</p>
           </div>
 
-          {editingId && (
+          {editingTarget && (
             <button
               type="button"
               className="schedule-cancel-edit"
@@ -303,7 +306,7 @@ function AcademicSchedulesPage() {
               name="courseId"
               value={formData.courseId}
               onChange={handleChange}
-              disabled={Boolean(editingId)}
+              disabled={Boolean(editingTarget)}
             >
               <option value="">Select Course</option>
 
@@ -371,7 +374,7 @@ function AcademicSchedulesPage() {
 
           <div className="schedule-submit-wrapper">
             <button type="submit">
-              {editingId ? "Save Changes" : "+ Add Schedule"}
+              {editingTarget ? "Save Changes" : "+ Add Schedule"}
             </button>
           </div>
         </div>
@@ -408,7 +411,7 @@ function AcademicSchedulesPage() {
                       {daySchedules.map((schedule) => (
                         <div
                           className="schedule-class-card"
-                          key={`${schedule.courseId}-${schedule.id}`}
+                          key={schedule.scheduleTarget}
                         >
                           <div className="schedule-class-time">
                             <strong>{schedule.startTime}</strong>

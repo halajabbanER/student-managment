@@ -43,7 +43,7 @@
   color: #4b5563;
 }
 
-.academic-user button {
+.academic-user button:not(.academic-theme-btn) {
   padding: 9px 16px;
 
   border: none;
@@ -59,7 +59,36 @@
   transition: 0.3s;
 }
 
-.academic-user button:hover {
+.academic-theme-btn {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  background: #eef2ff;
+
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.academic-theme-btn svg {
+  color: #4f46e5;
+  font-size: 18px;
+}
+
+.academic-theme-btn:hover {
+  background: #dbe4ff;
+
+  transform: translateY(-2px);
+}
+
+.academic-user button:not(.academic-theme-btn):hover {
   background: #dc2626;
 
   transform: translateY(-2px);
@@ -281,6 +310,24 @@ body.dark-mode .academic-management {
   background: #1f2937;
 
   border-color: #374151;
+}
+
+body.dark-mode .academic-user,
+body.dark-mode .academic-user span {
+  color: #e5e7eb;
+}
+
+body.dark-mode .academic-theme-btn {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+body.dark-mode .academic-theme-btn svg {
+  color: #fde68a;
+}
+
+body.dark-mode .academic-theme-btn:hover {
+  background: #111827;
 }
 
 body.dark-mode .academic-card {
