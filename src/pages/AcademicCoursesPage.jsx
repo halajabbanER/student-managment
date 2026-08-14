@@ -275,6 +275,28 @@ function AcademicCoursesPage() {
       return courses;
     }
 
+    const getDepartmentName = (departmentId) => {
+      const department = departments.find(
+        (item) => String(item.id) === String(departmentId),
+      );
+
+      return department ? department.name : "Unknown Department";
+    };
+
+    const getTeacherName = (teacherId) => {
+      if (!teacherId) {
+        return "Not Assigned";
+      }
+
+      const teacher = teachers.find(
+        (item) =>
+          String(item.id) === String(teacherId) ||
+          String(item.teacherId) === String(teacherId),
+      );
+
+      return teacher ? teacher.name : "Not Assigned";
+    };
+
     return courses.filter((course) => {
       const departmentName = getDepartmentName(course.departmentId);
 

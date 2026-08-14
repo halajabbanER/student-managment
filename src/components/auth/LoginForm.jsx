@@ -116,6 +116,16 @@ function LoginPage() {
           email.
         </p>
 
+        <p className="auth-subtitle" style={{ marginTop: "-0.5rem" }}>
+          Demo academic login: <strong>academic@hala.com</strong> /{" "}
+          <strong>Academic123</strong>
+        </p>
+
+        <p className="auth-subtitle" style={{ marginTop: "-0.75rem" }}>
+          Demo student login: <strong>20032003</strong> /{" "}
+          <strong>Student123</strong>
+        </p>
+
         {errors.general && <p className="login-error">{errors.general}</p>}
 
         <form onSubmit={handleSubmit} autoComplete="off">
@@ -156,7 +166,23 @@ function LoginPage() {
           <button type="submit" className="auth-btn">
             Login
           </button>
-         
+
+          <p className="auth-link">
+            Student without an account?{" "}
+            <span onClick={() => navigate("/register")}>Register</span>
+          </p>
+
+          <p className="auth-link">
+            Academic staff?{" "}
+            <span onClick={() => navigate("/academic-register")}>
+              Create account
+            </span>
+          </p>
+
+          <p className="auth-link">
+            Administrator?{" "}
+            <span onClick={() => navigate("/admin-login")}>Admin Login</span>
+          </p>
         </form>
       </div>
     </div>

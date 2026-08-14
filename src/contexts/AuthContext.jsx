@@ -1,8 +1,39 @@
-import { createContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-const AuthContext = createContext(null);
+import AuthContext from "./AuthContext.js";
 
-function AuthProvider({ children }) {
+function readList(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "[]");
+  } catch (error) {
+    console.error(`${key} storage error:`, error);
+    return [];
+  }
+}
+
+function writeList(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+const DEFAULT_ADMIN_ACCOUNT = {
+  id: 1,
+  name: "System Admin",
+  email: "admin@hala.com",
+  password: "Admin123",
+  role: "admin",
+};
+
+const DEFAULT_ACADEMIC_ACCOUNT = {
+  id: 2,
+  name: "Academic Staff",
+  email: "academic@hala.com",
+  password: "Academic123",
+  role: "academic",
+};
+
+
+
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     try {
       const savedUser = localStorage.getItem("currentUser");
@@ -18,46 +49,51 @@ function AuthProvider({ children }) {
   // Create default Admin + Academic accounts
   useEffect(() => {
     try {
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-
-      const defaultAccounts = [
-        {
-          id: 1,
-          name: "System Admin",
-          email: "admin@hala.com",
-          password: "Admin123",
-          role: "admin",
-        },
-        {
-          id: 2,
-          name: "Academic Staff",
-          email: "academic@hala.com",
-          password: "Academic123",
-          role: "academic",
-        },
-      ];
+      const users = readList("users");
+      const students = readList("students");
 
       const updatedUsers = [...users];
 
-      defaultAccounts.forEach((defaultAccount) => {
-        const existingIndex = updatedUsers.findIndex(
-          (item) =>
-            item.role === defaultAccount.role &&
-            item.email?.toLowerCase() === defaultAccount.email.toLowerCase(),
-        );
+      [DEFAULT_ADMIN_ACCOUNT, DEFAULT_ACADEMIC_ACCOUNT].forEach(
+        (defaultAccount) => {
+          const existingIndex = updatedUsers.findIndex(
+            (item) =>
+              item.role === defaultAccount.role &&
+              item.email?.toLowerCase() === defaultAccount.email.toLowerCase(),
+          );
 
-        if (existingIndex >= 0) {
-          updatedUsers[existingIndex] = {
-            ...updatedUsers[existingIndex],
-            ...defaultAccount,
-          };
-          return;
-        }
+          if (existingIndex >= 0) {
+            updatedUsers[existingIndex] = {
+              ...updatedUsers[existingIndex],
+              ...defaultAccount,
+            };
+            return;
+          }
 
-        updatedUsers.push(defaultAccount);
-      });
+          updatedUsers.push(defaultAccount);
+        },
+      );
 
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
+      writeList("users", updatedUsers);
+
+      const existingStudentIndex = students.findIndex(
+        (item) =>
+          String(item.studentId) === String(DEFAULT_STUDENT_ACCOUNT.studentId),
+      );
+
+      const updatedStudents =
+        existingStudentIndex >= 0
+          ? students.map((item, index) =>
+              index === existingStudentIndex
+                ? {
+                    ...item,
+                    ...DEFAULT_STUDENT_ACCOUNT,
+                  }
+                : item,
+            )
+          : [...students, DEFAULT_STUDENT_ACCOUNT];
+
+      writeList("students", updatedStudents);
     } catch (error) {
       console.error("Initialize Users Error:", error);
     }
@@ -66,50 +102,131 @@ function AuthProvider({ children }) {
   // Login
   const login = (identifier, password) => {
     try {
-      const users = JSON.parse(localStorage.getItem("users")) || [];
+      const cleanIdentifier = String(identifier).trim();
+      const cleanPassword = String(password);
+      const students = readList("students");
+      const teachers = readList("teachers");
+      const academicUsers = readList("academicUsers");
+      const users = readList("users");
 
-      const foundUser = users.find((item) => {
-        // Admin / Academic
-        if (item.role === "admin" || item.role === "academic") {
-          return (
-            item.email?.toLowerCase() === String(identifier).toLowerCase() &&
-            item.password === password
-          );
+      const student = students.find(
+        (item) =>
+          String(item.studentId) === cleanIdentifier &&
+          String(item.password) === cleanPassword,
+      );
+
+      if (student) {
+        if (student.status === "Inactive") {
+          return {
+            success: false,
+            message: "Your student account is inactive.",
+          };
         }
 
-        // Student
-        if (item.role === "student") {
-          return (
-            String(item.studentId) === String(identifier) &&
-            item.password === password
-          );
+        const foundUser = {
+          ...student,
+          role: "student",
+        };
+
+        setUser(foundUser);
+
+        localStorage.setItem("currentUser", JSON.stringify(foundUser));
+
+        return {
+          success: true,
+          user: foundUser,
+        };
+      }
+
+      const teacher = teachers.find(
+        (item) =>
+          String(item.teacherId || item.id) === cleanIdentifier &&
+          String(item.password) === cleanPassword,
+      );
+
+      if (teacher) {
+        if (teacher.status === "Inactive") {
+          return {
+            success: false,
+            message: "Your teacher account is inactive.",
+          };
         }
 
-        // Teacher
-        if (item.role === "teacher") {
-          return (
-            String(item.teacherId) === String(identifier) &&
-            item.password === password
-          );
-        }
+        const foundUser = {
+          ...teacher,
+          role: "teacher",
+        };
 
-        return false;
-      });
+        setUser(foundUser);
 
-      if (!foundUser) {
+        localStorage.setItem("currentUser", JSON.stringify(foundUser));
+
+        return {
+          success: true,
+          user: foundUser,
+        };
+      }
+
+      const academic =
+        academicUsers.find(
+          (item) =>
+            String(item.email || "").toLowerCase() ===
+              cleanIdentifier.toLowerCase() &&
+            String(item.password) === cleanPassword,
+        ) ||
+        users.find(
+          (item) =>
+            item.role === "academic" &&
+            String(item.email || "").toLowerCase() ===
+              cleanIdentifier.toLowerCase() &&
+            String(item.password) === cleanPassword,
+        );
+
+      if (academic) {
+        const foundUser = {
+          ...academic,
+          role: "academic",
+        };
+
+        setUser(foundUser);
+
+        localStorage.setItem("currentUser", JSON.stringify(foundUser));
+
+        return {
+          success: true,
+          user: foundUser,
+        };
+      }
+
+      const legacyAdmin = users.find(
+        (item) =>
+          item.role === "admin" &&
+          String(item.email || "").toLowerCase() ===
+            cleanIdentifier.toLowerCase() &&
+          String(item.password) === cleanPassword,
+      );
+
+      if (legacyAdmin) {
+        setUser(legacyAdmin);
+
+        localStorage.setItem("currentUser", JSON.stringify(legacyAdmin));
+
+        return {
+          success: true,
+          user: legacyAdmin,
+        };
+      }
+
+      if (!users.length && !students.length && !teachers.length) {
         return {
           success: false,
           message: "Invalid login information",
         };
       }
 
-      setUser(foundUser);
-
-      localStorage.setItem("currentUser", JSON.stringify(foundUser));
-
       return {
-        success: true,
-        user: foundUser,
+        success: false,
+        message: "Invalid login information",
       };
     } catch (error) {
       console.error("Login Error:", error);
@@ -254,6 +371,74 @@ function AuthProvider({ children }) {
     }
   };
 
+  // Academic Register
+  const registerAcademic = (userData) => {
+    try {
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      const academicUsers = JSON.parse(
+        localStorage.getItem("academicUsers"),
+      ) || [];
+
+      const email = String(userData.email || "").trim().toLowerCase();
+
+      const existingAcademic = academicUsers.find(
+        (item) => String(item.email || "").trim().toLowerCase() === email,
+      );
+
+      if (existingAcademic) {
+        return {
+          success: false,
+          message: "This academic email is already registered",
+        };
+      }
+
+      const newAcademic = {
+        id: Date.now(),
+        name: String(userData.name || "").trim(),
+        email,
+        password: userData.password,
+        role: "academic",
+      };
+
+      localStorage.setItem(
+        "academicUsers",
+        JSON.stringify([...academicUsers, newAcademic]),
+      );
+
+      const existingUser = users.find(
+        (item) =>
+          item.role === "academic" &&
+          String(item.email || "").trim().toLowerCase() === email,
+      );
+
+      const updatedUsers = existingUser
+        ? users.map((item) =>
+            item.role === "academic" &&
+            String(item.email || "").trim().toLowerCase() === email
+              ? {
+                  ...item,
+                  ...newAcademic,
+                }
+              : item,
+          )
+        : [...users, newAcademic];
+
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+
+      return {
+        success: true,
+        user: newAcademic,
+      };
+    } catch (error) {
+      console.error("Academic Register Error:", error);
+
+      return {
+        success: false,
+        message: "Something went wrong",
+      };
+    }
+  };
+
   // Logout
   const logout = () => {
     setUser(null);
@@ -273,6 +458,7 @@ function AuthProvider({ children }) {
         login,
         register,
         registerTeacher,
+        registerAcademic,
         logout,
         isAuthenticated,
         isAdmin,
@@ -286,4 +472,3 @@ function AuthProvider({ children }) {
 }
 
 export default AuthProvider;
-export { AuthContext, AuthProvider };

@@ -29,13 +29,33 @@ function CourseEnrollmentPage() {
     return course?.students || [];
   });
 
+  const availableStudents = useMemo(() => {
+    if (!course) {
+      return [];
+    }
+
+    const search = searchTerm.trim().toLowerCase();
+
+    return students.filter((student) => {
+      const sameDepartment =
+        !department || student.department === department.name;
+
+      const matchesSearch =
+        !search ||
+        student.name?.toLowerCase().includes(search) ||
+        String(student.studentId || student.id).includes(search);
+
+      return sameDepartment && matchesSearch;
+    });
+  }, [students, searchTerm, department, course]);
+
   if (!course) {
     return (
       <div className="course-enrollment-page">
         <div className="enrollment-message">
           <h2>Course not found</h2>
 
-          <button onClick={() => navigate("/academic/courses")}>
+          <button type="button" onClick={() => navigate("/academic/courses")}>
             Back to Courses
           </button>
         </div>
@@ -52,22 +72,6 @@ function CourseEnrollmentPage() {
       String(item.id) === String(course.teacherId) ||
       String(item.teacherId) === String(course.teacherId),
   );
-
-  const availableStudents = useMemo(() => {
-    const search = searchTerm.trim().toLowerCase();
-
-    return students.filter((student) => {
-      const sameDepartment =
-        !department || student.department === department.name;
-
-      const matchesSearch =
-        !search ||
-        student.name?.toLowerCase().includes(search) ||
-        String(student.studentId || student.id).includes(search);
-
-      return sameDepartment && matchesSearch;
-    });
-  }, [students, searchTerm, department]);
 
   const handleToggleStudent = (student) => {
     const studentId = student.studentId || student.id;

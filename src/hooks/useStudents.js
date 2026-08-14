@@ -1,555 +1,263 @@
-import { useCallback, useEffect, useState } from "react";
-
+import { useCallback } from "react";
 import useLocalStorage from "./useLocalStorage";
-
-import {
-  fetchStudentsFromAPI,
-  createStudentAPI,
-  updateStudentAPI,
-  deleteStudentAPI,
-} from "../services/api";
 
 function useStudents() {
   const [students, setStudents] = useLocalStorage("students", []);
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
   // =========================
-  // Generate Student ID
+  // ADD STUDENT
   // =========================
 
-  const generateStudentId = useCallback(() => {
-    const year = new Date().getFullYear();
+  const addStudent = useCallback(
+    (studentData) => {
+      const studentIdExists = students.some(
+        (student) =>
+          String(student.studentId).toLowerCase() ===
+          String(studentData.studentId).trim().toLowerCase(),
+      );
 
-    const existingNumbers = students
-      .map((student) => student.studentId)
-      .filter(Boolean)
-      .map((studentId) => {
-        const idString = String(studentId);
-
-        return Number(idString.slice(4));
-      })
-      .filter((number) => !Number.isNaN(number));
-
-    const nextNumber =
-      existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
-
-    return `${year}${String(nextNumber).padStart(4, "0")}`;
-  }, [students]);
-
-  // =========================
-  // Load Students From API
-  // =========================
-
-  useEffect(() => {
-    const loadStudents = async () => {
-      // إذا في بيانات محفوظة لا نعيد تحميل API
-      if (students.length > 0) {
-        return;
+      if (studentIdExists) {
+        return {
+          success: false,
+          message: "Student ID already exists.",
+        };
       }
 
-      try {
-        setLoading(true);
-        setError("");
+      const emailExists = students.some(
+        (student) =>
+          student.email?.toLowerCase() ===
+          studentData.email?.trim().toLowerCase(),
+      );
 
-        const apiStudents = await fetchStudentsFromAPI();
-
-        setStudents(apiStudents);
-      } catch (err) {
-        console.error("Load Students Error:", err);
-
-        setError("Failed to load students from API");
-      } finally {
-        setLoading(false);
+      if (emailExists) {
+        return {
+          success: false,
+          message: "Student email already exists.",
+        };
       }
-    };
 
-    loadStudents();
-  }, [students.length, setStudents]);
+      const newStudent = {
+        id: Date.now(),
+
+        studentId: studentData.studentId.trim(),
+
+        password: studentData.password,
+
+        name: studentData.name.trim(),
+
+        email: studentData.email.trim(),
+
+        department: studentData.department,
+
+        level: studentData.level,
+
+        status: studentData.status || "Active",
+
+        role: "student",
+
+        courses: studentData.courses || [],
+
+        exams: studentData.exams || [],
+
+        schedule: studentData.schedule || [],
+
+        createdAt: new Date().toISOString(),
+      };
+
+      setStudents((prevStudents) => [...prevStudents, newStudent]);
+
+      return {
+        success: true,
+        student: newStudent,
+      };
+    },
+    [students, setStudents],
+  );
 
   // =========================
-  // Get One Student
+  // GET STUDENT
   // =========================
 
   const getStudent = useCallback(
     (id) => {
-      return students.find((student) => Number(student.id) === Number(id));
-    },
-    [students],
-  );
-
-  // =========================
-  // Get Student By Student ID
-  // =========================
-
-  const getStudentByStudentId = useCallback(
-    (studentId) => {
       return students.find(
-        (student) => String(student.studentId) === String(studentId),
+        (student) =>
+          String(student.id) === String(id) ||
+          String(student.studentId) === String(id),
       );
     },
     [students],
   );
 
   // =========================
-  // Add Student
-  // =========================
-
-  const addStudent = useCallback(
-    async (studentData) => {
-      try {
-        setLoading(true);
-        setError("");
-
-        const generatedStudentId = generateStudentId();
-
-        const newStudentData = {
-          ...studentData,
-
-          studentId: generatedStudentId,
-
-          courses: [],
-          exams: [],
-          schedule: [],
-
-          accountCreated: false,
-        };
-
-        const createdStudent = await createStudentAPI(newStudentData);
-
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-
-        if (studentData.password) {
-          const existingUserIndex = users.findIndex(
-            (user) =>
-              user.role === "student" &&
-              String(user.studentId) === String(generatedStudentId),
-          );
-
-          const studentUser = {
-            id: createdStudent.id || Date.now(),
-            name: createdStudent.name,
-            studentId: generatedStudentId,
-            password: studentData.password,
-            role: "student",
-          };
-
-          if (existingUserIndex >= 0) {
-            users[existingUserIndex] = studentUser;
-          } else {
-            users.push(studentUser);
-          }
-
-          localStorage.setItem("users", JSON.stringify(users));
-        }
-
-        const finalStudent = {
-          ...createdStudent,
-
-          // نضمن بقاء الرقم الجامعي
-          studentId: generatedStudentId,
-
-          courses: createdStudent.courses || [],
-
-          exams: createdStudent.exams || [],
-
-          schedule: createdStudent.schedule || [],
-
-          accountCreated: Boolean(studentData.password),
-
-          source: "local",
-        };
-
-        setStudents((prevStudents) => [...prevStudents, finalStudent]);
-
-        return {
-          success: true,
-          student: finalStudent,
-          studentPassword: studentData.password || "",
-        };
-      } catch (err) {
-        console.error("Add Student Error:", err);
-
-        setError("Failed to add student");
-
-        return {
-          success: false,
-          message: "Failed to add student",
-        };
-      } finally {
-        setLoading(false);
-      }
-    },
-    [generateStudentId, setStudents],
-  );
-
-  // =========================
-  // Update Student
+  // UPDATE STUDENT
   // =========================
 
   const updateStudent = useCallback(
-    async (id, updatedData) => {
-      try {
-        setLoading(true);
-        setError("");
+    (id, updatedData) => {
+      const studentIdExists = students.some(
+        (student) =>
+          String(student.id) !== String(id) &&
+          String(student.studentId).toLowerCase() ===
+            String(updatedData.studentId).trim().toLowerCase(),
+      );
 
-        const studentId = Number(id);
-
-        const currentStudent = students.find(
-          (student) => Number(student.id) === studentId,
-        );
-
-        if (!currentStudent) {
-          return {
-            success: false,
-            message: "Student not found",
-          };
-        }
-
-        let finalData = updatedData;
-
-        // فقط طلاب API الأصليين
-        // نرسل لهم PUT
-        if (currentStudent.source === "api" && studentId <= 10) {
-          finalData = await updateStudentAPI(studentId, updatedData);
-        }
-
-        setStudents((prevStudents) =>
-          prevStudents.map((student) =>
-            Number(student.id) === studentId
-              ? {
-                  ...student,
-                  ...finalData,
-
-                  // ممنوع تغيير Student ID
-                  studentId: student.studentId,
-
-                  courses: student.courses || [],
-
-                  exams: student.exams || [],
-
-                  schedule: student.schedule || [],
-
-                  accountCreated: student.accountCreated || false,
-                }
-              : student,
-          ),
-        );
-
-        return {
-          success: true,
-        };
-      } catch (err) {
-        console.error("Update Student Error:", err);
-
-        setError("Failed to update student");
-
+      if (studentIdExists) {
         return {
           success: false,
-          message: "Failed to update student",
-        };
-      } finally {
-        setLoading(false);
-      }
-    },
-    [students, setStudents],
-  );
-
-  // =========================
-  // Delete Student
-  // =========================
-
-  const deleteStudent = useCallback(
-    async (id) => {
-      try {
-        setLoading(true);
-        setError("");
-
-        const student = students.find((item) => Number(item.id) === Number(id));
-
-        if (!student) {
-          return {
-            success: false,
-            message: "Student not found",
-          };
-        }
-
-        // فقط بيانات API الأصلية
-        if (student.source === "api" && Number(id) <= 10) {
-          await deleteStudentAPI(id);
-        }
-
-        setStudents((prevStudents) =>
-          prevStudents.filter((student) => Number(student.id) !== Number(id)),
-        );
-
-        return {
-          success: true,
-        };
-      } catch (err) {
-        console.error("Delete Student Error:", err);
-
-        setError("Failed to delete student");
-
-        return {
-          success: false,
-          message: "Failed to delete student",
-        };
-      } finally {
-        setLoading(false);
-      }
-    },
-    [students, setStudents],
-  );
-
-  // =========================
-  // Generate ID For Old Student
-  // =========================
-
-  const assignStudentId = useCallback(
-    (id) => {
-      try {
-        const student = students.find((item) => Number(item.id) === Number(id));
-
-        if (!student) {
-          return {
-            success: false,
-            message: "Student not found",
-          };
-        }
-
-        // عنده رقم أصلًا
-        if (student.studentId) {
-          return {
-            success: false,
-            message: "Student already has a Student ID",
-          };
-        }
-
-        const generatedId = generateStudentId();
-
-        setStudents((prevStudents) =>
-          prevStudents.map((student) =>
-            Number(student.id) === Number(id)
-              ? {
-                  ...student,
-
-                  studentId: generatedId,
-
-                  accountCreated: false,
-                }
-              : student,
-          ),
-        );
-
-        return {
-          success: true,
-          studentId: generatedId,
-        };
-      } catch (err) {
-        console.error("Generate Student ID Error:", err);
-
-        return {
-          success: false,
-          message: "Failed to generate Student ID",
+          message: "Another student already uses this Student ID.",
         };
       }
-    },
-    [students, generateStudentId, setStudents],
-  );
 
-  // =========================
-  // Mark Student Account Created
-  // =========================
-
-  const markAccountCreated = useCallback(
-    (studentId) => {
       setStudents((prevStudents) =>
         prevStudents.map((student) =>
-          String(student.studentId) === String(studentId)
+          String(student.id) === String(id)
             ? {
                 ...student,
-                accountCreated: true,
+
+                ...updatedData,
+
+                studentId: updatedData.studentId?.trim() || student.studentId,
+
+                name: updatedData.name?.trim() || student.name,
+
+                email: updatedData.email?.trim() || student.email,
+
+                password: updatedData.password || student.password,
+
+                role: "student",
               }
             : student,
         ),
       );
+
+      return {
+        success: true,
+      };
+    },
+    [students, setStudents],
+  );
+
+  // =========================
+  // DELETE STUDENT
+  // =========================
+
+  const deleteStudent = useCallback(
+    (id) => {
+      setStudents((prevStudents) =>
+        prevStudents.filter((student) => String(student.id) !== String(id)),
+      );
+
+      return {
+        success: true,
+      };
     },
     [setStudents],
   );
 
   // =========================
-  // Add Course
+  // ADD COURSE
   // =========================
 
   const addCourse = useCallback(
     (studentId, courseData) => {
-      try {
-        setError("");
+      const newCourse = {
+        id: Date.now(),
+        ...courseData,
+      };
 
-        setStudents((prevStudents) =>
-          prevStudents.map((student) =>
-            Number(student.id) === Number(studentId)
-              ? {
-                  ...student,
+      setStudents((prevStudents) =>
+        prevStudents.map((student) =>
+          String(student.id) === String(studentId) ||
+          String(student.studentId) === String(studentId)
+            ? {
+                ...student,
 
-                  courses: [
-                    ...(student.courses || []),
+                courses: [...(student.courses || []), newCourse],
+              }
+            : student,
+        ),
+      );
 
-                    {
-                      id: Date.now(),
-
-                      ...courseData,
-                    },
-                  ],
-                }
-              : student,
-          ),
-        );
-
-        return {
-          success: true,
-        };
-      } catch (err) {
-        console.error("Add Course Error:", err);
-
-        setError("Failed to add course");
-
-        return {
-          success: false,
-        };
-      }
+      return {
+        success: true,
+      };
     },
     [setStudents],
   );
 
   // =========================
-  // Update Course Grade
+  // UPDATE COURSE GRADE
   // =========================
 
   const updateCourseGrade = useCallback(
     (studentId, courseId, newGrade) => {
-      try {
-        setError("");
+      setStudents((prevStudents) =>
+        prevStudents.map((student) =>
+          String(student.id) === String(studentId) ||
+          String(student.studentId) === String(studentId)
+            ? {
+                ...student,
 
-        setStudents((prevStudents) =>
-          prevStudents.map((student) =>
-            Number(student.id) === Number(studentId)
-              ? {
-                  ...student,
+                courses: (student.courses || []).map((course) =>
+                  String(course.id) === String(courseId)
+                    ? {
+                        ...course,
+                        grade: Number(newGrade),
+                      }
+                    : course,
+                ),
+              }
+            : student,
+        ),
+      );
 
-                  courses: (student.courses || []).map((course) =>
-                    course.id === courseId
-                      ? {
-                          ...course,
-
-                          grade: Number(newGrade),
-                        }
-                      : course,
-                  ),
-                }
-              : student,
-          ),
-        );
-
-        return {
-          success: true,
-        };
-      } catch (err) {
-        console.error("Update Grade Error:", err);
-
-        setError("Failed to update grade");
-
-        return {
-          success: false,
-        };
-      }
+      return {
+        success: true,
+      };
     },
     [setStudents],
   );
 
   // =========================
-  // Delete Course
+  // DELETE COURSE
   // =========================
 
   const deleteCourse = useCallback(
     (studentId, courseId) => {
-      try {
-        setError("");
+      setStudents((prevStudents) =>
+        prevStudents.map((student) =>
+          String(student.id) === String(studentId) ||
+          String(student.studentId) === String(studentId)
+            ? {
+                ...student,
 
-        setStudents((prevStudents) =>
-          prevStudents.map((student) =>
-            Number(student.id) === Number(studentId)
-              ? {
-                  ...student,
+                courses: (student.courses || []).filter(
+                  (course) => String(course.id) !== String(courseId),
+                ),
+              }
+            : student,
+        ),
+      );
 
-                  courses: (student.courses || []).filter(
-                    (course) => course.id !== courseId,
-                  ),
-                }
-              : student,
-          ),
-        );
-
-        return {
-          success: true,
-        };
-      } catch (err) {
-        console.error("Delete Course Error:", err);
-
-        setError("Failed to delete course");
-
-        return {
-          success: false,
-        };
-      }
+      return {
+        success: true,
+      };
     },
     [setStudents],
   );
 
-  // =========================
-  // Retry API
-  // =========================
-
-  const refetchStudents = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const apiStudents = await fetchStudentsFromAPI();
-
-      setStudents(apiStudents);
-    } catch (err) {
-      console.error("API Error:", err);
-
-      setError("Failed to fetch students from API");
-    } finally {
-      setLoading(false);
-    }
-  }, [setStudents]);
-
   return {
     students,
-    loading,
-    error,
-
-    getStudent,
-    getStudentByStudentId,
 
     addStudent,
+    getStudent,
     updateStudent,
     deleteStudent,
-
-    generateStudentId,
-    assignStudentId,
-    markAccountCreated,
 
     addCourse,
     updateCourseGrade,
     deleteCourse,
-
-    refetchStudents,
   };
 }
 
