@@ -82,7 +82,7 @@ function AcademicDashboardPage() {
 
   const academicStats = [
     { label: "Students", value: useCountUp(students.length), icon: FaUserGraduate, color: "#5b4df7" },
-    { label: "Teachers", value: useCountUp(teachers.length), icon: FaChalkboardUser, color: "#0f9d58" },
+    { label: "Academic Staff", value: useCountUp(teachers.length), icon: FaChalkboardUser, color: "#0f9d58" },
     { label: "Departments", value: useCountUp(departments.length), icon: FaBuilding, color: "#f59e0b" },
     { label: "Courses", value: useCountUp(courses.length), icon: FaBookOpen, color: "#ec4899" },
   ];
@@ -96,8 +96,8 @@ function AcademicDashboardPage() {
       path: "/academic/students",
     },
     {
-      title: "Teachers",
-      description: "Manage academic staff and teacher information.",
+      title: "Academic Staff",
+      description: "Manage academic staff information.",
       icon: FaChalkboardUser,
       color: "#0f9d58",
       path: "/academic/teachers",

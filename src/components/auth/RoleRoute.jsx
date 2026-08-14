@@ -18,6 +18,10 @@ function RoleRoute({ allowedRoles, children }) {
       return <Navigate to="/academic" replace />;
     }
 
+    if (user?.role === "teacher") {
+      return <Navigate to="/academic" replace />;
+    }
+
     return <Navigate to="/login" replace />;
   }
 

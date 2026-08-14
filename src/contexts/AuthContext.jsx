@@ -15,6 +15,21 @@ function writeList(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
+function normalizeRole(user) {
+  if (!user) {
+    return null;
+  }
+
+  if (user.role === "teacher") {
+    return {
+      ...user,
+      role: "academic",
+    };
+  }
+
+  return user;
+}
+
 const DEFAULT_ADMIN_ACCOUNT = {
   id: 1,
   name: "System Admin",
@@ -54,7 +69,7 @@ export function AuthProvider({ children }) {
     try {
       const savedUser = localStorage.getItem("currentUser");
 
-      return savedUser ? JSON.parse(savedUser) : null;
+      return savedUser ? normalizeRole(JSON.parse(savedUser)) : null;
     } catch (error) {
       console.error("Current User Error:", error);
 
@@ -160,14 +175,14 @@ export function AuthProvider({ children }) {
           String(item.password) === cleanPassword,
       );
 
-      const registeredTeacher = users.find(
+      const registeredAcademic = users.find(
         (item) =>
-          item.role === "teacher" &&
+          (item.role === "teacher" || item.role === "academic") &&
           String(item.teacherId || item.id) === cleanIdentifier &&
           String(item.password) === cleanPassword,
       );
 
-      const teacherAccount = teacher || registeredTeacher;
+      const teacherAccount = teacher || registeredAcademic;
 
       if (teacherAccount) {
         if (teacherAccount.status === "Inactive") {
@@ -179,7 +194,7 @@ export function AuthProvider({ children }) {
 
         const foundUser = {
           ...teacherAccount,
-          role: "teacher",
+          role: "academic",
         };
 
         setUser(foundUser);
@@ -366,7 +381,7 @@ export function AuthProvider({ children }) {
         name: teacherExists.name,
         teacherId: teacherExists.teacherId,
         password: userData.password,
-        role: "teacher",
+        role: "academic",
       };
 
       localStorage.setItem("users", JSON.stringify([...users, newUser]));

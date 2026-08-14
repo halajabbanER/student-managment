@@ -9,17 +9,23 @@ import {
   FaSearch,
   FaShieldAlt,
   FaTasks,
+  FaBookOpen,
+  FaChalkboardTeacher,
   FaUserPlus,
   FaUsers,
   FaArrowRight,
 } from "react-icons/fa";
 
+import useCourses from "../hooks/useCourses";
 import useStudents from "../hooks/useStudents";
+import useTeachers from "../hooks/useTeachers";
 import "./HomePage.css";
 
 function HomePage() {
   const navigate = useNavigate();
   const { students } = useStudents();
+  const { teachers } = useTeachers();
+  const { courses } = useCourses();
   const [query, setQuery] = useState("");
 
   const totalStudents = students.length;
@@ -34,6 +40,8 @@ function HomePage() {
   ).length;
   const departments = new Set(students.map((student) => student.department))
     .size;
+  const totalTeachers = teachers.length;
+  const totalCourses = courses.length;
 
   const visibleStudents = useMemo(() => {
     const search = query.trim().toLowerCase();
@@ -45,8 +53,7 @@ function HomePage() {
     return students
       .filter((student) => {
         const fields = [
-          student.firstName,
-          student.lastName,
+          student.name,
           student.studentId,
           student.department,
           student.status,
@@ -80,6 +87,18 @@ function HomePage() {
       value: graduatedStudents,
       icon: <FaGraduationCap />,
       tone: "violet",
+    },
+    {
+      label: "Teachers",
+      value: totalTeachers,
+      icon: <FaChalkboardTeacher />,
+      tone: "green",
+    },
+    {
+      label: "Courses",
+      value: totalCourses,
+      icon: <FaBookOpen />,
+      tone: "amber",
     },
   ];
 
@@ -156,10 +175,28 @@ function HomePage() {
           </div>
 
           <div className="header-actions">
-          
-            <button className="header-primary" onClick={() => navigate("/student/new")}>
+            <button
+              className="header-primary"
+              onClick={() => navigate("/student/new")}
+            >
               <FaUserPlus />
               Add Student
+            </button>
+
+            <button
+              className="header-primary"
+              onClick={() => navigate("/academic/teachers")}
+            >
+              <FaChalkboardTeacher />
+              Add Teacher
+            </button>
+
+            <button
+              className="header-primary"
+              onClick={() => navigate("/academic/courses")}
+            >
+              <FaBookOpen />
+              Add Course
             </button>
           </div>
         </header>
@@ -178,10 +215,13 @@ function HomePage() {
           <div className="tab-row">
             <button className="tab active">Students</button>
             <button className="tab" onClick={() => navigate("/academic")}>
-              Academic
+              Academic Admin
             </button>
-            <button className="tab" onClick={() => navigate("/teacher-portal")}>
-              Teachers
+            <button className="tab" onClick={() => navigate("/academic/teachers")}>
+              Add Teacher
+            </button>
+            <button className="tab" onClick={() => navigate("/academic/courses")}>
+              Add Course
             </button>
           </div>
         </section>
@@ -227,7 +267,7 @@ function HomePage() {
 
                     <div className="task-copy">
                       <strong>
-                        {student.firstName} {student.lastName}
+                        {student.name}
                       </strong>
                       <span>
                         {student.studentId} - {student.department || "No department"}
@@ -262,7 +302,33 @@ function HomePage() {
               </div>
               <div className="side-link-copy">
                 <strong>Academic</strong>
-                <span>Teachers, departments, academic students</span>
+                <span>Academic staff, departments, academic students</span>
+              </div>
+            </button>
+
+            <button
+              className="side-link academic"
+              onClick={() => navigate("/academic/teachers")}
+            >
+              <div className="side-link-icon">
+                <FaChalkboardTeacher />
+              </div>
+              <div className="side-link-copy">
+                <strong>Add Teacher</strong>
+                <span>Create or manage academic staff records</span>
+              </div>
+            </button>
+
+            <button
+              className="side-link academic"
+              onClick={() => navigate("/academic/courses")}
+            >
+              <div className="side-link-icon">
+                <FaBookOpen />
+              </div>
+              <div className="side-link-copy">
+                <strong>Add Course</strong>
+                <span>Create or manage academic courses</span>
               </div>
             </button>
 

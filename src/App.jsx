@@ -4,7 +4,6 @@ import { Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AcademicRegisterPage from "./pages/AcademicRegisterPage";
-import TeacherRegisterPage from "./pages/TeacherRegisterPage";
 
 import AdminLoginPage from "./components/auth/AdminLoginPage";
 
@@ -16,7 +15,6 @@ import StudentDetailsPage from "./pages/StudentDetailsPage";
 import StudentFormPage from "./pages/StudentFormPage";
 
 /* Academic */
-import AcademicDashboardPage from "./pages/AcademicDashboardPage";
 import AcademicStudentsPage from "./pages/AcademicStudentsPage";
 import AcademicTeachersPage from "./pages/AcademicTeachersPage";
 import AcademicDepartmentsPage from "./pages/AcademicDepartmentsPage";
@@ -27,10 +25,10 @@ import CourseEnrollmentPage from "./pages/CourseEnrollmentPage";
 /* Student */
 import StudentPortalPage from "./pages/StudentPortalPage";
 import StudentDocumentPage from "./pages/StudentDocumentPage";
-/* Teacher */
-import TeacherPortalPage from "./pages/TeacherPortalPage";
-import TeacherCourseStudentsPage from "./pages/TeacherCourseStudentsPage";
-import TeacherExamsPage from "./pages/TeacherExamsPage";
+/* Academic Portal */
+import AcademicPortalPage from "./pages/AcademicPortalPage";
+import AcademicCourseStudentsPage from "./pages/AcademicCourseStudentsPage";
+import AcademicCourseExamsPage from "./pages/AcademicCourseExamsPage";
 import AcademicGradesPage from "./pages/AcademicGradesPage";
 import AcademicSchedulesPage from "./pages/AcademicSchedulesPage";
 /* Other */
@@ -54,8 +52,6 @@ function App() {
 
           <Route path="/academic-register" element={<AcademicRegisterPage />} />
 
-          <Route path="/teacher-register" element={<TeacherRegisterPage />} />
-
           <Route path="/admin-login" element={<AdminLoginPage />} />
 
           {/* STUDENT */}
@@ -77,39 +73,31 @@ function App() {
             }
           />
 
-          {/* TEACHER */}
+          {/* ACADEMIC PORTAL */}
 
           <Route
-            path="/teacher-portal"
+            path="/academic/course/:id/students"
             element={
-              <RoleRoute allowedRoles={["teacher"]}>
-                <TeacherPortalPage />
+              <RoleRoute allowedRoles={["academic"]}>
+                <AcademicCourseStudentsPage />
               </RoleRoute>
             }
           />
 
           <Route
-            path="/teacher/course/:id/students"
+            path="/academic/course/:id/grades"
             element={
-              <RoleRoute allowedRoles={["teacher"]}>
-                <TeacherCourseStudentsPage />
+              <RoleRoute allowedRoles={["academic"]}>
+                <AcademicCourseStudentsPage />
               </RoleRoute>
             }
           />
 
           <Route
-            path="/teacher/course/:id/grades"
+            path="/academic/course/:id/exams"
             element={
-              <RoleRoute allowedRoles={["teacher"]}>
-                <TeacherCourseStudentsPage />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/teacher/course/:id/exams"
-            element={
-              <RoleRoute allowedRoles={["teacher"]}>
-                <TeacherExamsPage />
+              <RoleRoute allowedRoles={["academic"]}>
+                <AcademicCourseExamsPage />
               </RoleRoute>
             }
           />
@@ -137,7 +125,7 @@ function App() {
             path="/academic"
             element={
               <RoleRoute allowedRoles={["admin", "academic"]}>
-                <AcademicDashboardPage />
+                <AcademicPortalPage />
               </RoleRoute>
             }
           />

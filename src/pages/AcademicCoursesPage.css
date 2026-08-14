@@ -553,6 +553,12 @@
   color: #4f46e5;
 }
 
+.course-grade-btn {
+  background: #ecfeff;
+
+  color: #0891b2;
+}
+
 .course-delete-btn {
   background: #fee2e2;
 

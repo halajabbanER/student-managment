@@ -6,9 +6,9 @@ import useTeachers from "../hooks/useTeachers";
 import useCourses from "../hooks/useCourses";
 import useStudents from "../hooks/useStudents";
 
-import "./TeacherPortalPage.css";
+import "./AcademicPortalPage.css";
 
-function TeacherPortalPage() {
+function AcademicPortalPage() {
   const navigate = useNavigate();
 
   const { user, logout } = useAuth();
@@ -16,23 +16,38 @@ function TeacherPortalPage() {
   const { courses } = useCourses();
   const { students } = useStudents();
 
-  const teacher = useMemo(() => {
-    return teachers.find(
+  const academicProfile = useMemo(() => {
+    const currentEmail = String(user?.email || "").trim().toLowerCase();
+
+    const byTeacherId = teachers.find(
       (item) => String(item.teacherId || item.id) === String(user?.teacherId),
     );
+
+    const byEmail = currentEmail
+      ? teachers.find(
+          (item) =>
+            String(item.email || "").trim().toLowerCase() === currentEmail,
+        )
+      : null;
+
+    const byId = teachers.find((item) => String(item.id) === String(user?.id));
+
+    return byTeacherId || byEmail || byId || user || null;
   }, [teachers, user]);
 
   const teacherCourses = useMemo(() => {
-    if (!teacher) {
+    if (!academicProfile) {
       return [];
     }
 
+    const profileTeacherId = academicProfile.teacherId || academicProfile.id;
+
     return courses.filter(
       (course) =>
-        String(course.teacherId) === String(teacher.id) ||
-        String(course.teacherId) === String(teacher.teacherId),
+        String(course.teacherId) === String(profileTeacherId) ||
+        String(course.teacherId) === String(academicProfile.teacherId),
     );
-  }, [courses, teacher]);
+  }, [courses, academicProfile]);
 
   const getCourseStudents = (course) => {
     const enrolledIds = course.students || [];
@@ -63,6 +78,17 @@ function TeacherPortalPage() {
     );
   }, [teacherCourses]);
 
+  const academicName = academicProfile?.name || user?.name || "Academic Staff";
+  const academicId =
+    academicProfile?.teacherId || academicProfile?.id || user?.teacherId || "-";
+  const academicDepartment =
+    academicProfile?.department || user?.department || "-";
+  const academicTitle = academicProfile?.title || user?.title || "-";
+  const academicStatus = academicProfile?.status || user?.status || "Active";
+  const hasAcademicRecord = Boolean(
+    academicProfile?.teacherId || academicProfile?.id,
+  );
+
   const handleLogout = () => {
     logout();
 
@@ -71,28 +97,14 @@ function TeacherPortalPage() {
     });
   };
 
-  if (!teacher) {
-    return (
-      <div className="teacher-portal-page">
-        <div className="teacher-portal-error">
-          <h2>Teacher information not found</h2>
-
-          <p>Please contact Academic Administration.</p>
-
-          <button onClick={handleLogout}>Logout</button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="teacher-portal-page">
       <header className="teacher-portal-header">
         <div>
-          <h2>👨‍🏫 Teacher Portal</h2>
+          <h2>👨‍🏫 Academic Dashboard</h2>
 
           <p>
-            Welcome, <strong>{teacher.name}</strong>
+            Welcome, <strong>{academicName}</strong>
           </p>
         </div>
 
@@ -101,10 +113,20 @@ function TeacherPortalPage() {
         </button>
       </header>
 
+      <div className="teacher-portal-shortcuts">
+        <button type="button" onClick={() => navigate("/academic/grades")}>
+          View Grades
+        </button>
+
+        <button type="button" onClick={() => navigate("/academic/courses")}>
+          Manage Courses
+        </button>
+      </div>
+
       <main className="teacher-portal-content">
         <section className="teacher-profile-section">
           <div className="teacher-profile-avatar">
-            {teacher.name
+            {academicName
               ?.split(" ")
               .map((word) => word[0])
               .slice(0, 2)
@@ -113,21 +135,21 @@ function TeacherPortalPage() {
           </div>
 
           <div>
-            <h1>{teacher.name}</h1>
+            <h1>{academicName}</h1>
 
             <p>
-              <strong>Teacher ID:</strong> {teacher.teacherId}
+              <strong>Academic ID:</strong> {academicId}
             </p>
 
             <p>
-              <strong>Department:</strong> {teacher.department || "-"}
+              <strong>Department:</strong> {academicDepartment}
             </p>
 
             <p>
-              <strong>Title:</strong> {teacher.title || "-"}
+              <strong>Title:</strong> {academicTitle}
             </p>
 
-            <span>{teacher.status || "Active"}</span>
+            <span>{academicStatus}</span>
           </div>
         </section>
 
@@ -161,9 +183,7 @@ function TeacherPortalPage() {
 
             <span>Status</span>
 
-            <strong className="teacher-status-text">
-              {teacher.status || "Active"}
-            </strong>
+            <strong className="teacher-status-text">{academicStatus}</strong>
           </div>
         </section>
 
@@ -177,6 +197,19 @@ function TeacherPortalPage() {
 
             <span>{teacherCourses.length} Courses</span>
           </div>
+
+          {!hasAcademicRecord ? (
+            <div className="teacher-empty-courses">
+              <div>📚</div>
+
+              <h3>No Academic Profile Linked</h3>
+
+              <p>
+                Your account is active, but it is not linked to a staff record
+                yet.
+              </p>
+            </div>
+          ) : null}
 
           {teacherCourses.length > 0 ? (
             <div className="teacher-courses-grid">
@@ -224,7 +257,7 @@ function TeacherPortalPage() {
                         type="button"
                         className="teacher-view-students-btn"
                         onClick={() =>
-                          navigate(`/teacher/course/${course.id}/students`)
+                          navigate(`/academic/course/${course.id}/students`)
                         }
                       >
                         👨‍🎓 Students
@@ -234,7 +267,7 @@ function TeacherPortalPage() {
                         type="button"
                         className="teacher-grades-btn"
                         onClick={() =>
-                          navigate(`/teacher/course/${course.id}/students`)
+                          navigate(`/academic/course/${course.id}/grades`)
                         }
                       >
                         📊 Grades
@@ -244,7 +277,7 @@ function TeacherPortalPage() {
                         type="button"
                         className="teacher-exams-btn"
                         onClick={() =>
-                          navigate(`/teacher/course/${course.id}/exams`)
+                          navigate(`/academic/course/${course.id}/exams`)
                         }
                       >
                         📝 Exams
@@ -269,4 +302,4 @@ function TeacherPortalPage() {
   );
 }
 
-export default TeacherPortalPage;
+export default AcademicPortalPage;

@@ -630,6 +630,14 @@ function AcademicCoursesPage() {
 
                 <button
                   type="button"
+                  className="course-grade-btn"
+                  onClick={() => navigate(`/academic/grades?courseId=${course.id}`)}
+                >
+                  📝 Grades
+                </button>
+
+                <button
+                  type="button"
                   className="course-edit-btn"
                   onClick={() => handleEdit(course)}
                 >

@@ -6,9 +6,9 @@ import useTeachers from "../hooks/useTeachers";
 import useCourses from "../hooks/useCourses";
 import useStudents from "../hooks/useStudents";
 
-import "./TeacherCourseStudentsPage.css";
+import "./AcademicCourseStudentsPage.css";
 
-function TeacherCourseStudentsPage() {
+function AcademicCourseStudentsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -42,8 +42,8 @@ function TeacherCourseStudentsPage() {
         <div className="teacher-course-message">
           <h2>Course not found</h2>
 
-          <button onClick={() => navigate("/teacher-portal")}>
-            Back to Teacher Portal
+          <button onClick={() => navigate("/academic")}>
+            Back to Academic Dashboard
           </button>
         </div>
       </div>
@@ -63,8 +63,8 @@ function TeacherCourseStudentsPage() {
 
           <p>You are not assigned to this course.</p>
 
-          <button onClick={() => navigate("/teacher-portal")}>
-            Back to Teacher Portal
+          <button onClick={() => navigate("/academic")}>
+            Back to Academic Dashboard
           </button>
         </div>
       </div>
@@ -139,9 +139,9 @@ function TeacherCourseStudentsPage() {
         <button
           type="button"
           className="teacher-course-back-btn"
-          onClick={() => navigate("/teacher-portal")}
+          onClick={() => navigate("/academic")}
         >
-          ← Teacher Portal
+          ← Academic Dashboard
         </button>
       </div>
 
@@ -152,7 +152,7 @@ function TeacherCourseStudentsPage() {
         </div>
 
         <div>
-          <span>Teacher</span>
+          <span>Academic</span>
           <strong>{teacher.name}</strong>
         </div>
 
@@ -271,4 +271,4 @@ function TeacherCourseStudentsPage() {
   );
 }
 
-export default TeacherCourseStudentsPage;
+export default AcademicCourseStudentsPage;

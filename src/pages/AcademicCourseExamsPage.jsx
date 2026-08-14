@@ -5,9 +5,9 @@ import useAuth from "../hooks/useAuth";
 import useTeachers from "../hooks/useTeachers";
 import useCourses from "../hooks/useCourses";
 
-import "./TeacherExamsPage.css";
+import "./AcademicCourseExamsPage.css";
 
-function TeacherExamsPage() {
+function AcademicCourseExamsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -42,8 +42,8 @@ function TeacherExamsPage() {
         <div className="teacher-exams-message">
           <h2>Course not found</h2>
 
-          <button onClick={() => navigate("/teacher-portal")}>
-            Back to Teacher Portal
+          <button onClick={() => navigate("/academic")}>
+            Back to Academic Dashboard
           </button>
         </div>
       </div>
@@ -63,8 +63,8 @@ function TeacherExamsPage() {
 
           <p>You are not assigned to this course.</p>
 
-          <button onClick={() => navigate("/teacher-portal")}>
-            Back to Teacher Portal
+          <button onClick={() => navigate("/academic")}>
+            Back to Academic Dashboard
           </button>
         </div>
       </div>
@@ -178,8 +178,8 @@ function TeacherExamsPage() {
           </p>
         </div>
 
-        <button type="button" onClick={() => navigate("/teacher-portal")}>
-          ← Teacher Portal
+        <button type="button" onClick={() => navigate("/academic")}>
+          ← Academic Dashboard
         </button>
       </div>
 
@@ -341,4 +341,4 @@ function TeacherExamsPage() {
   );
 }
 
-export default TeacherExamsPage;
+export default AcademicCourseExamsPage;

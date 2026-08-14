@@ -20,7 +20,7 @@ function TeacherRegisterPage() {
     const newErrors = {};
 
     if (!teacherId.trim()) {
-      newErrors.teacherId = "Teacher ID is required";
+      newErrors.teacherId = "Academic ID is required";
     }
 
     if (!password) {
@@ -60,7 +60,7 @@ function TeacherRegisterPage() {
       return;
     }
 
-    alert("Teacher account created successfully!");
+    alert("Academic account created successfully!");
 
     setTeacherId("");
     setPassword("");
@@ -73,10 +73,10 @@ function TeacherRegisterPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Teacher Registration</h1>
+        <h1>Academic Registration</h1>
 
         <p className="auth-subtitle">
-          Create your account using the Teacher ID provided by Academic
+          Create your account using the Academic ID provided by Academic
           Administration.
         </p>
 
@@ -84,11 +84,11 @@ function TeacherRegisterPage() {
 
         <form onSubmit={handleSubmit} autoComplete="off">
           <div className="form-group">
-            <label>Teacher ID</label>
+            <label>Academic ID</label>
 
             <input
               type="text"
-              placeholder="Example: T20260001"
+              placeholder="Example: A20260001"
               value={teacherId}
               onChange={(event) => {
                 setTeacherId(event.target.value);
@@ -156,7 +156,7 @@ function TeacherRegisterPage() {
           </div>
 
           <button type="submit" className="auth-btn">
-            Create Teacher Account
+            Create Academic Account
           </button>
         </form>
 

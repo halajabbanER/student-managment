@@ -59,7 +59,7 @@ function AcademicTeachersPage() {
     }
 
     alert(
-      `Teacher added successfully.\nTeacher ID: ${result.teacher.teacherId}\nPassword: ${result.teacher.password}`,
+      `Academic staff added successfully.\nAcademic ID: ${result.teacher.teacherId}\nPassword: ${result.teacher.password}`,
     );
 
     setFormData({
@@ -82,12 +82,12 @@ function AcademicTeachersPage() {
       return;
     }
 
-    alert(`Teacher ID generated successfully: ${result.teacherId}`);
+    alert(`Academic ID generated successfully: ${result.teacherId}`);
   };
 
   const handleDelete = (id) => {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this teacher?",
+      "Are you sure you want to delete this academic staff member?",
     );
 
     if (!confirmed) {
@@ -101,9 +101,9 @@ function AcademicTeachersPage() {
     <div className="academic-teachers-page">
       <div className="teachers-page-header">
         <div>
-          <h1>Teachers</h1>
+          <h1>Academic Staff</h1>
 
-          <p>Manage teachers and academic staff records.</p>
+          <p>Manage academic staff records.</p>
         </div>
 
         <div className="teachers-header-actions">
@@ -120,14 +120,14 @@ function AcademicTeachersPage() {
             className="teachers-add-btn"
             onClick={() => setShowForm(!showForm)}
           >
-            {showForm ? "Close Form" : "+ Add Teacher"}
+            {showForm ? "Close Form" : "+ Add Academic"}
           </button>
         </div>
       </div>
 
       {showForm && (
         <form className="teacher-form" onSubmit={handleSubmit} autoComplete="off">
-          <h2>Add New Teacher</h2>
+          <h2>Add New Academic</h2>
 
           <div className="teacher-form-grid">
             <div className="teacher-form-group">
@@ -136,7 +136,7 @@ function AcademicTeachersPage() {
               <input
                 type="text"
                 name="name"
-                placeholder="Enter teacher name"
+                placeholder="Enter academic name"
                 value={formData.name}
                 onChange={handleChange}
                 autoComplete="off"
@@ -149,7 +149,7 @@ function AcademicTeachersPage() {
               <input
                 type="email"
                 name="email"
-                placeholder="teacher@university.com"
+                placeholder="academic@university.com"
                 value={formData.email}
                 onChange={handleChange}
                 autoComplete="off"
@@ -162,7 +162,7 @@ function AcademicTeachersPage() {
               <input
                 type="password"
                 name="password"
-                placeholder="Create teacher password"
+                placeholder="Create academic password"
                 value={formData.password}
                 onChange={handleChange}
                 autoComplete="new-password"
@@ -231,7 +231,7 @@ function AcademicTeachersPage() {
           </div>
 
           <button type="submit" className="teacher-save-btn">
-            Add Teacher
+            Add Academic
           </button>
         </form>
       )}
@@ -242,7 +242,7 @@ function AcademicTeachersPage() {
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Teacher ID</th>
+                <th>Academic ID</th>
                 <th>Email</th>
                 <th>Department</th>
                 <th>Title</th>
@@ -323,9 +323,9 @@ function AcademicTeachersPage() {
         </div>
       ) : (
         <div className="teachers-empty">
-          <h3>No teachers found</h3>
+          <h3>No academic staff found</h3>
 
-          <p>Add your first teacher to get started.</p>
+          <p>Add your first academic staff member to get started.</p>
         </div>
       )}
     </div>

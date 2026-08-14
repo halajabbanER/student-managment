@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import useCourses from "../hooks/useCourses";
 import useStudents from "../hooks/useStudents";
@@ -9,18 +9,29 @@ import "./AcademicGradesPage.css";
 
 function AcademicGradesPage() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const { courses } = useCourses();
+  const { courses, updateCourse } = useCourses();
   const { students } = useStudents();
   const { teachers } = useTeachers();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [courseFilter, setCourseFilter] = useState("All");
-  const [resultFilter, setResultFilter] = useState("All");
+  const [courseFilter, setCourseFilter] = useState(() => {
+    const params = new URLSearchParams(location.search);
 
-  // =========================
-  // GET STUDENT
-  // =========================
+    return params.get("courseId") || "All";
+  });
+  const [resultFilter, setResultFilter] = useState("All");
+  const [draftGrades, setDraftGrades] = useState({});
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const courseId = params.get("courseId");
+
+    if (courseId) {
+      setCourseFilter(courseId);
+    }
+  }, [location.search]);
 
   const getStudent = useCallback(
     (studentId) => {
@@ -31,10 +42,6 @@ function AcademicGradesPage() {
     },
     [students],
   );
-
-  // =========================
-  // GET TEACHER
-  // =========================
 
   const getTeacherName = useCallback(
     (teacherId) => {
@@ -48,10 +55,6 @@ function AcademicGradesPage() {
     },
     [teachers],
   );
-
-  // =========================
-  // ALL GRADES
-  // =========================
 
   const allGrades = useMemo(() => {
     const result = [];
@@ -76,23 +79,14 @@ function AcademicGradesPage() {
 
         result.push({
           id: `${course.id}-${student.id}`,
-
           studentId: student.studentId || student.id,
-
           studentName: student.name,
-
           department: student.department,
-
           level: student.level,
-
           courseId: course.id,
-
           courseCode: course.code,
-
           courseName: course.name,
-
           teacherId: course.teacherId,
-
           grade,
         });
       });
@@ -101,9 +95,163 @@ function AcademicGradesPage() {
     return result;
   }, [courses, getStudent]);
 
-  // =========================
-  // FILTER
-  // =========================
+  useEffect(() => {
+    setDraftGrades((prevDrafts) => {
+      const nextDrafts = { ...prevDrafts };
+
+      allGrades.forEach((item) => {
+        const key = `${item.courseId}:${item.studentId}`;
+
+        if (!(key in nextDrafts)) {
+          nextDrafts[key] = item.grade === null ? "" : String(item.grade);
+        }
+      });
+
+      return nextDrafts;
+    });
+  }, [allGrades]);
+
+  const getGradeKey = useCallback((courseId, studentId) => {
+    return `${courseId}:${studentId}`;
+  }, []);
+
+  const getGradeValue = useCallback(
+    (courseId, studentId, fallback) => {
+      const key = getGradeKey(courseId, studentId);
+
+      if (key in draftGrades) {
+        return draftGrades[key];
+      }
+
+      return fallback === null || fallback === undefined ? "" : String(fallback);
+    },
+    [draftGrades, getGradeKey],
+  );
+
+  const handleGradeChange = (courseId, studentId, value) => {
+    const key = getGradeKey(courseId, studentId);
+
+    setDraftGrades((prevDrafts) => ({
+      ...prevDrafts,
+      [key]: value,
+    }));
+  };
+
+  const handleSaveGrade = (item) => {
+    const key = getGradeKey(item.courseId, item.studentId);
+    const rawValue = String(draftGrades[key] ?? "").trim();
+    const course = courses.find(
+      (courseItem) => String(courseItem.id) === String(item.courseId),
+    );
+
+    if (!course) {
+      alert("Course not found.");
+      return;
+    }
+
+    if (rawValue !== "") {
+      const numericValue = Number(rawValue);
+
+      if (
+        Number.isNaN(numericValue) ||
+        numericValue < 0 ||
+        numericValue > 100
+      ) {
+        alert("Grades must be between 0 and 100.");
+        return;
+      }
+    }
+
+    const nextGrades = (course.grades || []).filter(
+      (grade) => String(grade.studentId) !== String(item.studentId),
+    );
+
+    if (rawValue !== "") {
+      nextGrades.push({
+        studentId: item.studentId,
+        grade: Number(rawValue),
+      });
+    }
+
+    const result = updateCourse(course.id, {
+      ...course,
+      grades: nextGrades,
+    });
+
+    if (!result.success) {
+      alert(result.message || "Failed to save grade.");
+      return;
+    }
+
+    setDraftGrades((prevDrafts) => ({
+      ...prevDrafts,
+      [key]: rawValue,
+    }));
+
+    alert("Grade saved successfully.");
+  };
+
+  const handleSaveVisibleGrades = () => {
+    const itemsToSave = filteredGrades;
+
+    if (itemsToSave.length === 0) {
+      alert("No grades to save.");
+      return;
+    }
+
+    for (const item of itemsToSave) {
+      const key = getGradeKey(item.courseId, item.studentId);
+      const rawValue = String(draftGrades[key] ?? "").trim();
+      const course = courses.find(
+        (courseItem) => String(courseItem.id) === String(item.courseId),
+      );
+
+      if (!course) {
+        continue;
+      }
+
+      if (rawValue !== "") {
+        const numericValue = Number(rawValue);
+
+        if (
+          Number.isNaN(numericValue) ||
+          numericValue < 0 ||
+          numericValue > 100
+        ) {
+          alert(`Invalid grade for ${item.studentName} in ${item.courseCode}.`);
+          return;
+        }
+      }
+
+      const nextGrades = (course.grades || []).filter(
+        (grade) => String(grade.studentId) !== String(item.studentId),
+      );
+
+      if (rawValue !== "") {
+        nextGrades.push({
+          studentId: item.studentId,
+          grade: Number(rawValue),
+        });
+      }
+
+      const result = updateCourse(course.id, {
+        ...course,
+        grades: nextGrades,
+      });
+
+      if (!result.success) {
+        alert(result.message || "Failed to save grades.");
+        return;
+      }
+
+      setDraftGrades((prevDrafts) => ({
+        ...prevDrafts,
+        [key]: rawValue,
+      }));
+    }
+
+    alert("Visible grades saved successfully.");
+  };
 
   const filteredGrades = useMemo(() => {
     const search = searchTerm.trim().toLowerCase();
@@ -120,8 +268,7 @@ function AcademicGradesPage() {
         teacherName.toLowerCase().includes(search);
 
       const matchesCourse =
-        courseFilter === "All" ||
-        String(item.courseId) === String(courseFilter);
+        courseFilter === "All" || String(item.courseId) === String(courseFilter);
 
       let matchesResult = true;
 
@@ -141,15 +288,13 @@ function AcademicGradesPage() {
     });
   }, [allGrades, searchTerm, courseFilter, resultFilter, getTeacherName]);
 
-  // =========================
-  // STATISTICS
-  // =========================
-
   const gradedStudents = allGrades.filter((item) => item.grade !== null);
-
   const passedStudents = gradedStudents.filter((item) => item.grade >= 50);
-
   const failedStudents = gradedStudents.filter((item) => item.grade < 50);
+  const selectedCourse =
+    courseFilter === "All"
+      ? null
+      : courses.find((course) => String(course.id) === String(courseFilter));
 
   const average =
     gradedStudents.length > 0
@@ -158,10 +303,6 @@ function AcademicGradesPage() {
           gradedStudents.length
         ).toFixed(2)
       : "0.00";
-
-  // =========================
-  // RESULT
-  // =========================
 
   const getResult = (grade) => {
     if (grade === null) {
@@ -186,25 +327,21 @@ function AcademicGradesPage() {
 
   return (
     <div className="academic-grades-page">
-      {/* HEADER */}
-
       <div className="academic-grades-header">
         <div>
           <h1>Grades Management</h1>
 
-          <p>View student grades across all courses.</p>
+          <p>Enter and review student grades for each course.</p>
         </div>
 
         <button type="button" onClick={() => navigate("/academic")}>
-          ← Dashboard
+          Dashboard
         </button>
       </div>
 
-      {/* STATISTICS */}
-
       <div className="academic-grades-stats">
         <div className="academic-grade-stat">
-          <div>📊</div>
+          <div>Average</div>
 
           <span>Average Grade</span>
 
@@ -212,7 +349,7 @@ function AcademicGradesPage() {
         </div>
 
         <div className="academic-grade-stat">
-          <div>✅</div>
+          <div>Passed</div>
 
           <span>Passed</span>
 
@@ -220,7 +357,7 @@ function AcademicGradesPage() {
         </div>
 
         <div className="academic-grade-stat">
-          <div>❌</div>
+          <div>Failed</div>
 
           <span>Failed</span>
 
@@ -228,21 +365,17 @@ function AcademicGradesPage() {
         </div>
 
         <div className="academic-grade-stat">
-          <div>⏳</div>
+          <div>Pending</div>
 
           <span>Pending</span>
 
-          <strong>
-            {allGrades.filter((item) => item.grade === null).length}
-          </strong>
+          <strong>{allGrades.filter((item) => item.grade === null).length}</strong>
         </div>
       </div>
 
-      {/* FILTERS */}
-
       <div className="academic-grades-tools">
         <div className="academic-grades-search">
-          <span>🔍</span>
+          <span>Search</span>
 
           <input
             type="text"
@@ -270,16 +403,30 @@ function AcademicGradesPage() {
           onChange={(event) => setResultFilter(event.target.value)}
         >
           <option value="All">All Results</option>
-
           <option value="Passed">Passed</option>
-
           <option value="Failed">Failed</option>
-
           <option value="Pending">Pending</option>
         </select>
       </div>
 
-      {/* TABLE */}
+      <p className="academic-grades-note">
+        Edit the grade in the table, then press Save for that student.
+      </p>
+
+      <div className="academic-grades-actions">
+        {selectedCourse && (
+          <div className="academic-grades-selected-course">
+            <span>Selected Course</span>
+            <strong>
+              {selectedCourse.code} - {selectedCourse.name}
+            </strong>
+          </div>
+        )}
+
+        <button type="button" onClick={handleSaveVisibleGrades}>
+          Save Visible Grades
+        </button>
+      </div>
 
       {filteredGrades.length > 0 ? (
         <div className="academic-grades-table-wrapper">
@@ -287,24 +434,26 @@ function AcademicGradesPage() {
             <thead>
               <tr>
                 <th>Student</th>
-
                 <th>Student ID</th>
-
                 <th>Course</th>
-
                 <th>Teacher</th>
-
                 <th>Level</th>
-
                 <th>Grade</th>
-
                 <th>Result</th>
+                <th>Action</th>
               </tr>
             </thead>
 
             <tbody>
               {filteredGrades.map((item) => {
-                const result = getResult(item.grade);
+                const gradeValue = getGradeValue(
+                  item.courseId,
+                  item.studentId,
+                  item.grade,
+                );
+                const normalizedGrade =
+                  String(gradeValue).trim() === "" ? null : Number(gradeValue);
+                const result = getResult(normalizedGrade);
 
                 return (
                   <tr key={item.id}>
@@ -328,9 +477,7 @@ function AcademicGradesPage() {
                     </td>
 
                     <td>
-                      <span className="academic-grade-id">
-                        {item.studentId}
-                      </span>
+                      <span className="academic-grade-id">{item.studentId}</span>
                     </td>
 
                     <td>
@@ -346,21 +493,37 @@ function AcademicGradesPage() {
                     <td>{item.level || "-"}</td>
 
                     <td>
-                      {item.grade === null ? (
-                        <span className="academic-grade-pending">-</span>
-                      ) : (
-                        <strong className="academic-grade-number">
-                          {item.grade}
-                        </strong>
-                      )}
+                      <input
+                        className="academic-grade-input"
+                        type="number"
+                        min="0"
+                        max="100"
+                        placeholder="0-100"
+                        value={gradeValue}
+                        onChange={(event) =>
+                          handleGradeChange(
+                            item.courseId,
+                            item.studentId,
+                            event.target.value,
+                          )
+                        }
+                      />
                     </td>
 
                     <td>
-                      <span
-                        className={`academic-grade-result ${result.className}`}
-                      >
+                      <span className={`academic-grade-result ${result.className}`}>
                         {result.text}
                       </span>
+                    </td>
+
+                    <td>
+                      <button
+                        type="button"
+                        className="academic-grade-save-btn"
+                        onClick={() => handleSaveGrade(item)}
+                      >
+                        Save
+                      </button>
                     </td>
                   </tr>
                 );
@@ -370,11 +533,11 @@ function AcademicGradesPage() {
         </div>
       ) : (
         <div className="academic-grades-empty">
-          <div>📊</div>
+          <div>Grades</div>
 
           <h2>No Grades Found</h2>
 
-          <p>Student grades entered by teachers will appear here.</p>
+          <p>Select a course and enter student grades to start tracking results.</p>
         </div>
       )}
     </div>

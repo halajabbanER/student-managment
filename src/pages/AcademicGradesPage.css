@@ -157,6 +157,74 @@
   outline: none;
 }
 
+.academic-grades-note {
+  margin: 0 0 16px;
+
+  color: #6b7280;
+
+  font-size: 13px;
+}
+
+.academic-grades-actions {
+  margin-bottom: 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.academic-grades-selected-course {
+  padding: 10px 14px;
+
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.academic-grades-selected-course span {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #64748b;
+
+  font-size: 12px;
+}
+
+.academic-grades-selected-course strong {
+  display: block;
+
+  font-size: 14px;
+}
+
+.academic-grades-actions button {
+  padding: 10px 16px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: linear-gradient(135deg, #0f9d58, #16a34a);
+  color: white;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.academic-grades-actions button:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 10px 20px rgba(22, 163, 74, 0.18);
+}
+
 /* TABLE */
 
 .academic-grades-table-wrapper {
@@ -188,6 +256,11 @@
 
   font-size: 12px;
   text-transform: uppercase;
+}
+
+.academic-grades-table th:last-child,
+.academic-grades-table td:last-child {
+  white-space: nowrap;
 }
 
 .academic-grades-table td {
@@ -297,6 +370,26 @@
   color: #9ca3af;
 }
 
+.academic-grade-input {
+  width: 100%;
+  min-width: 90px;
+  max-width: 120px;
+  padding: 9px 10px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+
+  background: #fff;
+  color: #111827;
+
+  outline: none;
+}
+
+.academic-grade-input:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+}
+
 /* RESULT */
 
 .academic-grade-result {
@@ -326,6 +419,30 @@
   background: #fef3c7;
 
   color: #d97706;
+}
+
+.academic-grade-save-btn {
+  padding: 9px 14px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: white;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.academic-grade-save-btn:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 10px 20px rgba(79, 70, 229, 0.18);
 }
 
 /* EMPTY */
@@ -392,5 +509,9 @@
 
   .academic-grades-search {
     grid-column: span 1;
+  }
+
+  .academic-grade-input {
+    min-width: 80px;
   }
 }

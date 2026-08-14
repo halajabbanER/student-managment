@@ -4,6 +4,81 @@ import useLocalStorage from "./useLocalStorage";
 function useStudents() {
   const [students, setStudents] = useLocalStorage("students", []);
 
+  const readUsers = useCallback(() => {
+    try {
+      const rawUsers = JSON.parse(localStorage.getItem("users") || "[]");
+
+      return Array.isArray(rawUsers) ? rawUsers : [];
+    } catch (error) {
+      console.error("Users storage error:", error);
+
+      return [];
+    }
+  }, []);
+
+  const writeUsers = useCallback((users) => {
+    localStorage.setItem("users", JSON.stringify(users));
+  }, []);
+
+  const syncStudentUser = useCallback(
+    (student) => {
+      const users = readUsers();
+      const matchingIndex = users.findIndex(
+        (user) =>
+          user.role === "student" &&
+          (String(user.studentId || "").trim().toLowerCase() ===
+            String(student.studentId || "").trim().toLowerCase() ||
+            String(user.email || "").trim().toLowerCase() ===
+              String(student.email || "").trim().toLowerCase() ||
+            String(user.id) === String(student.id)),
+      );
+
+      const studentUser = {
+        id: student.id,
+        name: student.name,
+        studentId: student.studentId,
+        email: student.email,
+        password: student.password,
+        department: student.department,
+        level: student.level,
+        status: student.status,
+        role: "student",
+        accountCreated: true,
+      };
+
+      const updatedUsers =
+        matchingIndex >= 0
+          ? users.map((user, index) =>
+              index === matchingIndex ? { ...user, ...studentUser } : user,
+            )
+          : [...users, studentUser];
+
+      writeUsers(updatedUsers);
+    },
+    [readUsers, writeUsers],
+  );
+
+  const removeStudentUser = useCallback(
+    (studentKey) => {
+      const users = readUsers();
+      const targetKey = String(studentKey);
+
+      const updatedUsers = users.filter((user) => {
+        if (user.role !== "student") {
+          return true;
+        }
+
+        const userId = String(user.id ?? "");
+        const userStudentId = String(user.studentId ?? "");
+
+        return userId !== targetKey && userStudentId !== targetKey;
+      });
+
+      writeUsers(updatedUsers);
+    },
+    [readUsers, writeUsers],
+  );
+
   const generateStudentId = useCallback(() => {
     const year = new Date().getFullYear();
     const existingIds = new Set(
@@ -29,6 +104,8 @@ function useStudents() {
 
   const addStudent = useCallback(
     (studentData) => {
+      const users = readUsers();
+
       const studentIdExists = students.some(
         (student) =>
           String(student.studentId).toLowerCase() ===
@@ -42,6 +119,20 @@ function useStudents() {
         };
       }
 
+      const userStudentIdExists = users.some(
+        (user) =>
+          user.role === "student" &&
+          String(user.studentId || "").trim().toLowerCase() ===
+            String(studentData.studentId).trim().toLowerCase(),
+      );
+
+      if (userStudentIdExists) {
+        return {
+          success: false,
+          message: "Student ID already exists.",
+        };
+      }
+
       const emailExists = students.some(
         (student) =>
           student.email?.toLowerCase() ===
@@ -49,6 +140,20 @@ function useStudents() {
       );
 
       if (emailExists) {
+        return {
+          success: false,
+          message: "Student email already exists.",
+        };
+      }
+
+      const userEmailExists = users.some(
+        (user) =>
+          String(user.email || "").trim().toLowerCase() ===
+            String(studentData.email || "").trim().toLowerCase() &&
+          user.role === "student",
+      );
+
+      if (userEmailExists) {
         return {
           success: false,
           message: "Student email already exists.",
@@ -80,17 +185,21 @@ function useStudents() {
 
         schedule: studentData.schedule || [],
 
+        accountCreated:
+          studentData.accountCreated ?? Boolean(studentData.password),
+
         createdAt: new Date().toISOString(),
       };
 
       setStudents((prevStudents) => [...prevStudents, newStudent]);
+      syncStudentUser(newStudent);
 
       return {
         success: true,
         student: newStudent,
       };
     },
-    [students, setStudents],
+    [readUsers, setStudents, students, syncStudentUser],
   );
 
   // =========================
@@ -150,11 +259,23 @@ function useStudents() {
         ),
       );
 
+      const updatedStudent = {
+        ...students.find((student) => String(student.id) === String(id)),
+        ...updatedData,
+        studentId: updatedData.studentId?.trim() || students.find((student) => String(student.id) === String(id))?.studentId,
+        name: updatedData.name?.trim() || students.find((student) => String(student.id) === String(id))?.name,
+        email: updatedData.email?.trim() || students.find((student) => String(student.id) === String(id))?.email,
+      };
+
+      if (updatedStudent?.id) {
+        syncStudentUser(updatedStudent);
+      }
+
       return {
         success: true,
       };
     },
-    [students, setStudents],
+    [setStudents, students, syncStudentUser],
   );
 
   // =========================
@@ -185,6 +306,8 @@ function useStudents() {
             !matchesStudentKey(student.studentId),
         ),
       );
+
+      removeStudentUser(id);
 
       try {
         const coursesRaw = JSON.parse(localStorage.getItem("courses") || "[]");
@@ -238,7 +361,7 @@ function useStudents() {
         success: true,
       };
     },
-    [students, setStudents],
+    [removeStudentUser, students, setStudents],
   );
 
   // =========================
@@ -277,12 +400,19 @@ function useStudents() {
         ),
       );
 
+      const updatedStudent = {
+        ...student,
+        studentId,
+      };
+
+      syncStudentUser(updatedStudent);
+
       return {
         success: true,
         studentId,
       };
     },
-    [generateStudentId, students, setStudents],
+    [generateStudentId, students, setStudents, syncStudentUser],
   );
 
   // =========================

@@ -74,17 +74,8 @@ function LoginPage() {
       return;
     }
 
-    // Teacher
-    if (result.user.role === "teacher") {
-      navigate("/teacher-portal", {
-        replace: true,
-      });
-
-      return;
-    }
-
     // Academic
-    if (result.user.role === "academic") {
+    if (result.user.role === "academic" || result.user.role === "teacher") {
       navigate("/academic", {
         replace: true,
       });
@@ -120,7 +111,7 @@ function LoginPage() {
 
         <form onSubmit={handleSubmit} autoComplete="off">
           <div className="form-group">
-            <label>Student ID / Teacher ID / Academic Email</label>
+            <label>Student ID / Academic ID / Academic Email</label>
 
             <input
               type="text"
