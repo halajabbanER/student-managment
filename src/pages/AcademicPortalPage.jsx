@@ -17,7 +17,9 @@ function AcademicPortalPage() {
   const { students } = useStudents();
 
   const academicProfile = useMemo(() => {
-    const currentEmail = String(user?.email || "").trim().toLowerCase();
+    const currentEmail = String(user?.email || "")
+      .trim()
+      .toLowerCase();
 
     const byTeacherId = teachers.find(
       (item) => String(item.teacherId || item.id) === String(user?.teacherId),
@@ -26,7 +28,9 @@ function AcademicPortalPage() {
     const byEmail = currentEmail
       ? teachers.find(
           (item) =>
-            String(item.email || "").trim().toLowerCase() === currentEmail,
+            String(item.email || "")
+              .trim()
+              .toLowerCase() === currentEmail,
         )
       : null;
 
@@ -35,19 +39,134 @@ function AcademicPortalPage() {
     return byTeacherId || byEmail || byId || user || null;
   }, [teachers, user]);
 
+  const teacherDepartment =
+    academicProfile?.department ||
+    user?.department ||
+    (() => {
+      try {
+        const savedUser = JSON.parse(
+          localStorage.getItem("currentUser") || "null",
+        );
+
+        return savedUser?.department || "";
+      } catch (error) {
+        console.error("Current user department read error:", error);
+        return "";
+      }
+    })() ||
+    "";
+
+  const normalizeText = (value) =>
+    String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+
+  const departmentMatchesTeacher = (departmentName, departmentCode) => {
+    const teacherKey = normalizeText(teacherDepartment);
+
+    if (!teacherKey) {
+      return false;
+    }
+
+    const departmentKey = normalizeText(departmentName || departmentCode);
+    const codeKey = normalizeText(departmentCode);
+
+    if (!departmentKey && !codeKey) {
+      return false;
+    }
+
+    return (
+      departmentKey === teacherKey ||
+      codeKey === teacherKey ||
+      teacherKey.includes(departmentKey) ||
+      departmentKey.includes(teacherKey) ||
+      teacherKey.includes(codeKey) ||
+      codeKey.includes(teacherKey)
+    );
+  };
+
   const teacherCourses = useMemo(() => {
-    if (!academicProfile) {
+    if (!academicProfile && !teacherDepartment) {
       return [];
     }
 
-    const profileTeacherId = academicProfile.teacherId || academicProfile.id;
+    const currentEmail = String(user?.email || "")
+      .trim()
+      .toLowerCase();
+    const profileTeacherId = academicProfile?.teacherId || academicProfile?.id;
 
-    return courses.filter(
-      (course) =>
-        String(course.teacherId) === String(profileTeacherId) ||
-        String(course.teacherId) === String(academicProfile.teacherId),
-    );
-  }, [courses, academicProfile]);
+    const departments = (() => {
+      try {
+        const saved = JSON.parse(localStorage.getItem("departments") || "[]");
+        return Array.isArray(saved) ? saved : [];
+      } catch (error) {
+        console.error("Departments storage error:", error);
+        return [];
+      }
+    })();
+
+    const matchingCourses = courses.filter((course) => {
+      const courseTeacherId = course.teacherId;
+      const courseTeacherMatch =
+        String(courseTeacherId) === String(profileTeacherId) ||
+        String(courseTeacherId) === String(academicProfile?.teacherId) ||
+        String(courseTeacherId) === String(academicProfile?.id) ||
+        String(courseTeacherId) === String(user?.id) ||
+        String(courseTeacherId) === String(user?.teacherId);
+
+      if (courseTeacherMatch) {
+        return true;
+      }
+
+      const courseTeacher = teachers.find(
+        (teacher) =>
+          String(teacher.id) === String(courseTeacherId) ||
+          String(teacher.teacherId) === String(courseTeacherId),
+      );
+
+      if (
+        courseTeacher &&
+        (String(courseTeacher.id) === String(academicProfile?.id) ||
+          String(courseTeacher.teacherId) ===
+            String(academicProfile?.teacherId) ||
+          String(courseTeacher.email || "")
+            .trim()
+            .toLowerCase() === currentEmail)
+      ) {
+        return true;
+      }
+
+      if (!teacherDepartment) {
+        return false;
+      }
+
+      if (!course.departmentId) {
+        return false;
+      }
+
+      const matchingDepartment = departments.find(
+        (department) =>
+          String(department.id) === String(course.departmentId) ||
+          String(department.code) === String(course.departmentId),
+      );
+
+      if (!matchingDepartment) {
+        return false;
+      }
+
+      return departmentMatchesTeacher(
+        matchingDepartment.name,
+        matchingDepartment.code,
+      );
+    });
+
+    return [
+      ...new Map(
+        matchingCourses.map((course) => [String(course.id), course]),
+      ).values(),
+    ];
+  }, [academicProfile, courses, teacherDepartment, teachers, user]);
 
   const getCourseStudents = (course) => {
     const enrolledIds = course.students || [];
@@ -77,6 +196,46 @@ function AcademicPortalPage() {
       0,
     );
   }, [teacherCourses]);
+
+  const quickActions = [
+    {
+      title: "Students",
+      description: "View and manage student records.",
+      icon: "👨‍🎓",
+      color: "#4f46e5",
+      onClick: () => navigate("/academic/students"),
+    },
+    {
+      title: "Grades",
+      description: "Track student performance.",
+      icon: "📊",
+      color: "#22c55e",
+      onClick: () => navigate("/academic/grades"),
+    },
+    {
+      title: "Exams",
+      description: "Manage any course assessments.",
+      icon: "📝",
+      color: "#f59e0b",
+      onClick: () => navigate("/academic/exams"),
+    },
+    {
+      title: "Quizzes",
+      description: "Open course quiz management.",
+      icon: "🧪",
+      color: "#ec4899",
+      onClick: () => {
+        const firstCourse = teacherCourses[0];
+
+        if (firstCourse) {
+          navigate(`/academic/course/${firstCourse.id}/quizzes`);
+          return;
+        }
+
+        navigate("/academic/courses");
+      },
+    },
+  ];
 
   const academicName = academicProfile?.name || user?.name || "Academic Staff";
   const academicId =
@@ -174,6 +333,44 @@ function AcademicPortalPage() {
             <span>Status</span>
 
             <strong className="teacher-status-text">{academicStatus}</strong>
+          </div>
+        </section>
+
+        <section className="teacher-quick-actions">
+          <div className="teacher-section-title">
+            <div>
+              <h2>Teacher Tools</h2>
+
+              <p>Manage your teaching work quickly.</p>
+            </div>
+          </div>
+
+          <div className="teacher-quick-grid">
+            {quickActions.map((action) => (
+              <button
+                key={action.title}
+                type="button"
+                className="teacher-quick-card"
+                onClick={action.onClick}
+              >
+                <div
+                  className="teacher-quick-icon"
+                  style={{
+                    background: `${action.color}1A`,
+                    color: action.color,
+                  }}
+                >
+                  {action.icon}
+                </div>
+
+                <div className="teacher-quick-copy">
+                  <h3>{action.title}</h3>
+                  <p>{action.description}</p>
+                </div>
+
+                <span className="teacher-quick-arrow">→</span>
+              </button>
+            ))}
           </div>
         </section>
 

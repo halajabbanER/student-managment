@@ -20,10 +20,92 @@ function AcademicCourseExamsPage() {
   }, [courses, id]);
 
   const teacher = useMemo(() => {
-    return teachers.find(
-      (item) => String(item.teacherId || item.id) === String(user?.teacherId),
+    const currentEmail = String(user?.email || "")
+      .trim()
+      .toLowerCase();
+
+    return (
+      teachers.find(
+        (item) => String(item.teacherId || item.id) === String(user?.teacherId),
+      ) ||
+      (currentEmail
+        ? teachers.find(
+            (item) =>
+              String(item.email || "")
+                .trim()
+                .toLowerCase() === currentEmail,
+          )
+        : null) ||
+      teachers.find((item) => String(item.id) === String(user?.id)) ||
+      user ||
+      null
     );
   }, [teachers, user]);
+
+  const normalizeText = (value) =>
+    String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+
+  const teacherDepartment = teacher?.department || user?.department || "";
+
+  const courseMatchesTeacherAccess = (targetCourse) => {
+    if (!targetCourse) {
+      return false;
+    }
+
+    if (user?.role === "admin") {
+      return true;
+    }
+
+    const userTeacherId = user?.teacherId || user?.id;
+
+    if (
+      String(targetCourse.teacherId) === String(teacher?.id) ||
+      String(targetCourse.teacherId) === String(teacher?.teacherId) ||
+      String(targetCourse.teacherId) === String(userTeacherId) ||
+      String(targetCourse.teacherId) === String(user?.id)
+    ) {
+      return true;
+    }
+
+    if (!teacherDepartment || !targetCourse.departmentId) {
+      return false;
+    }
+
+    try {
+      const departments = JSON.parse(
+        localStorage.getItem("departments") || "[]",
+      );
+      const department = departments.find(
+        (item) => String(item.id) === String(targetCourse.departmentId),
+      );
+
+      if (!department) {
+        return false;
+      }
+
+      return (
+        normalizeText(teacherDepartment) === normalizeText(department.name) ||
+        normalizeText(teacherDepartment) === normalizeText(department.code) ||
+        normalizeText(teacherDepartment).includes(
+          normalizeText(department.name),
+        ) ||
+        normalizeText(department.name).includes(
+          normalizeText(teacherDepartment),
+        ) ||
+        normalizeText(teacherDepartment).includes(
+          normalizeText(department.code),
+        ) ||
+        normalizeText(department.code).includes(
+          normalizeText(teacherDepartment),
+        )
+      );
+    } catch (error) {
+      return false;
+    }
+  };
 
   const [formData, setFormData] = useState({
     title: "",
@@ -50,10 +132,7 @@ function AcademicCourseExamsPage() {
     );
   }
 
-  const teacherHasAccess =
-    teacher &&
-    (String(course.teacherId) === String(teacher.id) ||
-      String(course.teacherId) === String(teacher.teacherId));
+  const teacherHasAccess = courseMatchesTeacherAccess(course);
 
   if (!teacherHasAccess) {
     return (

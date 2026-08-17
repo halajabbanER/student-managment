@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import useDepartments from "../hooks/useDepartments";
 
@@ -7,6 +7,7 @@ import "./AcademicDepartmentsPage.css";
 
 function AcademicDepartmentsPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const { departments, addDepartment, updateDepartment, deleteDepartment } =
     useDepartments();
@@ -58,8 +59,16 @@ function AcademicDepartmentsPage() {
   const handleCloseForm = () => {
     resetForm();
 
+    setSearchParams({});
     setShowForm(false);
   };
+
+  useEffect(() => {
+    if (searchParams.get("mode") === "add") {
+      resetForm();
+      setShowForm(true);
+    }
+  }, [searchParams]);
 
   const handleSubmit = (event) => {
     event.preventDefault();

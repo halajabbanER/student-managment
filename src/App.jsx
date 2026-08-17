@@ -15,6 +15,7 @@ import StudentDetailsPage from "./pages/StudentDetailsPage";
 import StudentFormPage from "./pages/StudentFormPage";
 
 /* Academic */
+import AcademicDashboardPage from "./pages/AcademicDashboardPage";
 import AcademicStudentsPage from "./pages/AcademicStudentsPage";
 import AcademicTeachersPage from "./pages/AcademicTeachersPage";
 import AcademicDepartmentsPage from "./pages/AcademicDepartmentsPage";
@@ -135,6 +136,24 @@ function App() {
             element={
               <RoleRoute allowedRoles={["admin", "academic"]}>
                 <AcademicPortalPage />
+              </RoleRoute>
+            }
+          />
+
+          <Route
+            path="/obs"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <AcademicPortalPage />
+              </RoleRoute>
+            }
+          />
+
+          <Route
+            path="/academic-admin"
+            element={
+              <RoleRoute allowedRoles={["admin", "academic"]}>
+                <AcademicDashboardPage />
               </RoleRoute>
             }
           />

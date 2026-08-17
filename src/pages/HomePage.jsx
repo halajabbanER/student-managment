@@ -198,6 +198,14 @@ function HomePage() {
               <FaBookOpen />
               Add Course
             </button>
+
+            <button
+              className="header-primary"
+              onClick={() => navigate("/academic/departments?mode=add")}
+            >
+              <FaBuilding />
+              Add Branch
+            </button>
           </div>
         </header>
 
@@ -217,11 +225,23 @@ function HomePage() {
             <button className="tab" onClick={() => navigate("/academic")}>
               Academic Admin
             </button>
-            <button className="tab" onClick={() => navigate("/academic/teachers")}>
+            <button
+              className="tab"
+              onClick={() => navigate("/academic/teachers")}
+            >
               Add Teacher
             </button>
-            <button className="tab" onClick={() => navigate("/academic/courses")}>
+            <button
+              className="tab"
+              onClick={() => navigate("/academic/courses")}
+            >
               Add Course
+            </button>
+            <button
+              className="tab"
+              onClick={() => navigate("/academic/departments?mode=add")}
+            >
+              Add Branch
             </button>
           </div>
         </section>
@@ -246,7 +266,10 @@ function HomePage() {
                 <h3>Latest students</h3>
               </div>
 
-              <button className="panel-link" onClick={() => navigate("/students")}>
+              <button
+                className="panel-link"
+                onClick={() => navigate("/students")}
+              >
                 View all
                 <FaArrowRight />
               </button>
@@ -266,15 +289,16 @@ function HomePage() {
                     </div>
 
                     <div className="task-copy">
-                      <strong>
-                        {student.name}
-                      </strong>
+                      <strong>{student.name}</strong>
                       <span>
-                        {student.studentId} - {student.department || "No department"}
+                        {student.studentId} -{" "}
+                        {student.department || "No department"}
                       </span>
                     </div>
 
-                    <span className={`task-status ${String(student.status || "").toLowerCase()}`}>
+                    <span
+                      className={`task-status ${String(student.status || "").toLowerCase()}`}
+                    >
                       {student.status || "Unknown"}
                     </span>
                   </button>
@@ -296,7 +320,10 @@ function HomePage() {
               </div>
             </div>
 
-            <button className="side-link academic" onClick={() => navigate("/academic")}>
+            <button
+              className="side-link academic"
+              onClick={() => navigate("/academic")}
+            >
               <div className="side-link-icon">
                 <FaBuilding />
               </div>
@@ -332,7 +359,23 @@ function HomePage() {
               </div>
             </button>
 
-            <button className="side-link student" onClick={() => navigate("/students")}>
+            <button
+              className="side-link academic"
+              onClick={() => navigate("/academic/departments?mode=add")}
+            >
+              <div className="side-link-icon">
+                <FaBuilding />
+              </div>
+              <div className="side-link-copy">
+                <strong>Add Branch</strong>
+                <span>Create or manage university branches</span>
+              </div>
+            </button>
+
+            <button
+              className="side-link student"
+              onClick={() => navigate("/students")}
+            >
               <div className="side-link-icon">
                 <FaUsers />
               </div>

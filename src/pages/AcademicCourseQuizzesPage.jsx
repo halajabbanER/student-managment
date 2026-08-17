@@ -29,10 +29,92 @@ function AcademicCourseQuizzesPage() {
   );
 
   const teacher = useMemo(() => {
-    return teachers.find(
-      (item) => String(item.teacherId || item.id) === String(user?.teacherId),
+    const currentEmail = String(user?.email || "")
+      .trim()
+      .toLowerCase();
+
+    return (
+      teachers.find(
+        (item) => String(item.teacherId || item.id) === String(user?.teacherId),
+      ) ||
+      (currentEmail
+        ? teachers.find(
+            (item) =>
+              String(item.email || "")
+                .trim()
+                .toLowerCase() === currentEmail,
+          )
+        : null) ||
+      teachers.find((item) => String(item.id) === String(user?.id)) ||
+      user ||
+      null
     );
   }, [teachers, user]);
+
+  const normalizeText = (value) =>
+    String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+
+  const teacherDepartment = teacher?.department || user?.department || "";
+
+  const courseMatchesTeacherAccess = (targetCourse) => {
+    if (!targetCourse) {
+      return false;
+    }
+
+    if (user?.role === "admin") {
+      return true;
+    }
+
+    const userTeacherId = user?.teacherId || user?.id;
+
+    if (
+      String(targetCourse.teacherId) === String(teacher?.id) ||
+      String(targetCourse.teacherId) === String(teacher?.teacherId) ||
+      String(targetCourse.teacherId) === String(userTeacherId) ||
+      String(targetCourse.teacherId) === String(user?.id)
+    ) {
+      return true;
+    }
+
+    if (!teacherDepartment || !targetCourse.departmentId) {
+      return false;
+    }
+
+    try {
+      const departments = JSON.parse(
+        localStorage.getItem("departments") || "[]",
+      );
+      const department = departments.find(
+        (item) => String(item.id) === String(targetCourse.departmentId),
+      );
+
+      if (!department) {
+        return false;
+      }
+
+      return (
+        normalizeText(teacherDepartment) === normalizeText(department.name) ||
+        normalizeText(teacherDepartment) === normalizeText(department.code) ||
+        normalizeText(teacherDepartment).includes(
+          normalizeText(department.name),
+        ) ||
+        normalizeText(department.name).includes(
+          normalizeText(teacherDepartment),
+        ) ||
+        normalizeText(teacherDepartment).includes(
+          normalizeText(department.code),
+        ) ||
+        normalizeText(department.code).includes(
+          normalizeText(teacherDepartment),
+        )
+      );
+    } catch (error) {
+      return false;
+    }
+  };
 
   const isAdmin = user?.role === "admin";
 
@@ -79,7 +161,9 @@ function AcademicCourseQuizzesPage() {
       return;
     }
 
-    const quiz = quizzes.find((item) => String(item.id) === String(selectedQuizId));
+    const quiz = quizzes.find(
+      (item) => String(item.id) === String(selectedQuizId),
+    );
 
     if (!quiz) {
       setDraftScores({});
@@ -117,11 +201,7 @@ function AcademicCourseQuizzesPage() {
     );
   }
 
-  const teacherHasAccess =
-    isAdmin ||
-    (teacher &&
-      (String(course.teacherId) === String(teacher.id) ||
-        String(course.teacherId) === String(teacher.teacherId)));
+  const teacherHasAccess = courseMatchesTeacherAccess(course) || isAdmin;
 
   if (!teacherHasAccess) {
     return (
@@ -216,7 +296,9 @@ function AcademicCourseQuizzesPage() {
 
     for (const student of courseStudents) {
       const studentIdentifier = student.studentId || student.id;
-      const rawValue = String(draftScores[String(studentIdentifier)] ?? "").trim();
+      const rawValue = String(
+        draftScores[String(studentIdentifier)] ?? "",
+      ).trim();
 
       if (rawValue !== "") {
         const numericValue = Number(rawValue);
@@ -291,7 +373,8 @@ function AcademicCourseQuizzesPage() {
           <h1>Course Quizzes</h1>
 
           <p>
-            Manage quiz titles and student marks for <strong>{course.name}</strong>.
+            Manage quiz titles and student marks for{" "}
+            <strong>{course.name}</strong>.
           </p>
         </div>
 
@@ -428,7 +511,11 @@ function AcademicCourseQuizzesPage() {
             </p>
           </div>
 
-          <button type="button" onClick={handleSaveScores} disabled={!selectedQuiz}>
+          <button
+            type="button"
+            onClick={handleSaveScores}
+            disabled={!selectedQuiz}
+          >
             Save Marks
           </button>
         </div>
@@ -449,7 +536,8 @@ function AcademicCourseQuizzesPage() {
                 <tbody>
                   {courseStudents.map((student) => {
                     const studentIdentifier = student.studentId || student.id;
-                    const scoreValue = draftScores[String(studentIdentifier)] ?? "";
+                    const scoreValue =
+                      draftScores[String(studentIdentifier)] ?? "";
 
                     return (
                       <tr key={student.id}>
@@ -479,7 +567,8 @@ function AcademicCourseQuizzesPage() {
                         <td>
                           {String(scoreValue).trim() === "" ? (
                             <span className="quiz-result pending">Pending</span>
-                          ) : Number(scoreValue) >= selectedQuiz.totalScore / 2 ? (
+                          ) : Number(scoreValue) >=
+                            selectedQuiz.totalScore / 2 ? (
                             <span className="quiz-result passed">Pass</span>
                           ) : (
                             <span className="quiz-result failed">Fail</span>

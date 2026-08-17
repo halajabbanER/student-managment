@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import useDepartments from "../hooks/useDepartments";
 import useTeachers from "../hooks/useTeachers";
 
 import "./AcademicTeachersPage.css";
@@ -10,6 +11,7 @@ function AcademicTeachersPage() {
 
   const { teachers, addTeacher, deleteTeacher, assignTeacherId } =
     useTeachers();
+  const { departments } = useDepartments();
 
   const [showForm, setShowForm] = useState(false);
 
@@ -112,7 +114,7 @@ function AcademicTeachersPage() {
             className="teachers-back-btn"
             onClick={() => navigate("/academic")}
           >
-             Dashboard
+            Dashboard
           </button>
 
           <button
@@ -126,7 +128,11 @@ function AcademicTeachersPage() {
       </div>
 
       {showForm && (
-        <form className="teacher-form" onSubmit={handleSubmit} autoComplete="off">
+        <form
+          className="teacher-form"
+          onSubmit={handleSubmit}
+          autoComplete="off"
+        >
           <h2>Add New Academic</h2>
 
           <div className="teacher-form-grid">
@@ -176,22 +182,21 @@ function AcademicTeachersPage() {
                 name="department"
                 value={formData.department}
                 onChange={handleChange}
+                disabled={departments.length === 0}
               >
-                <option value="">Select Department</option>
-
-                <option value="Computer Engineering">
-                  Computer Engineering
+                <option value="">
+                  {departments.length > 0
+                    ? "Select Department"
+                    : "Create a department first in admin panel"}
                 </option>
 
-                <option value="Software Engineering">
-                  Software Engineering
-                </option>
-
-                <option value="Electrical Engineering">
-                  Electrical Engineering
-                </option>
-
-                <option value="Civil Engineering">Civil Engineering</option>
+                {departments
+                  .filter((department) => department.status !== "Inactive")
+                  .map((department) => (
+                    <option key={department.id} value={department.name}>
+                      {department.name}
+                    </option>
+                  ))}
               </select>
             </div>
 

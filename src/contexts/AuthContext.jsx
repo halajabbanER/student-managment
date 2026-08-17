@@ -44,6 +44,9 @@ const DEFAULT_ACADEMIC_ACCOUNT = {
   email: "academic@hala.com",
   password: "Academic123",
   role: "academic",
+  department: "Computer Engineering",
+  title: "Lecturer",
+  status: "Active",
 };
 
 const DEFAULT_STUDENT_ACCOUNT = {
@@ -61,8 +64,6 @@ const DEFAULT_STUDENT_ACCOUNT = {
   exams: [],
   schedule: [],
 };
-
-
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
@@ -106,6 +107,32 @@ export function AuthProvider({ children }) {
       );
 
       writeList("users", updatedUsers);
+
+      try {
+        const currentUserRaw = localStorage.getItem("currentUser");
+
+        if (currentUserRaw) {
+          const currentUser = JSON.parse(currentUserRaw);
+
+          if (
+            currentUser &&
+            currentUser.role === "academic" &&
+            String(currentUser.email || "").toLowerCase() ===
+              DEFAULT_ACADEMIC_ACCOUNT.email.toLowerCase()
+          ) {
+            const refreshedUser = {
+              ...currentUser,
+              ...DEFAULT_ACADEMIC_ACCOUNT,
+              role: "academic",
+            };
+
+            localStorage.setItem("currentUser", JSON.stringify(refreshedUser));
+            setUser(refreshedUser);
+          }
+        }
+      } catch (error) {
+        console.error("Current User Refresh Error:", error);
+      }
 
       const existingStudentIndex = students.findIndex(
         (item) =>
@@ -416,14 +443,18 @@ export function AuthProvider({ children }) {
   const registerAcademic = (userData) => {
     try {
       const users = JSON.parse(localStorage.getItem("users")) || [];
-      const academicUsers = JSON.parse(
-        localStorage.getItem("academicUsers"),
-      ) || [];
+      const academicUsers =
+        JSON.parse(localStorage.getItem("academicUsers")) || [];
 
-      const email = String(userData.email || "").trim().toLowerCase();
+      const email = String(userData.email || "")
+        .trim()
+        .toLowerCase();
 
       const existingAcademic = academicUsers.find(
-        (item) => String(item.email || "").trim().toLowerCase() === email,
+        (item) =>
+          String(item.email || "")
+            .trim()
+            .toLowerCase() === email,
       );
 
       if (existingAcademic) {
@@ -449,13 +480,17 @@ export function AuthProvider({ children }) {
       const existingUser = users.find(
         (item) =>
           item.role === "academic" &&
-          String(item.email || "").trim().toLowerCase() === email,
+          String(item.email || "")
+            .trim()
+            .toLowerCase() === email,
       );
 
       const updatedUsers = existingUser
         ? users.map((item) =>
             item.role === "academic" &&
-            String(item.email || "").trim().toLowerCase() === email
+            String(item.email || "")
+              .trim()
+              .toLowerCase() === email
               ? {
                   ...item,
                   ...newAcademic,
