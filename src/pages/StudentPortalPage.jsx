@@ -1,118 +1,22 @@
-import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import useAuth from "../hooks/useAuth";
-import useStudents from "../hooks/useStudents";
-import useCourses from "../hooks/useCourses";
-import useTeachers from "../hooks/useTeachers";
+import useStudentPortalData from "../hooks/useStudentPortalData";
 
 import "./StudentPortalPage.css";
 
 function StudentPortalPage() {
   const navigate = useNavigate();
 
-  const { user, logout } = useAuth();
-  const { students } = useStudents();
-  const { courses } = useCourses();
-  const { teachers } = useTeachers();
-
-  // =========================
-  // CURRENT STUDENT
-  // =========================
-
-  const student = useMemo(() => {
-    return students.find(
-      (item) => String(item.studentId || item.id) === String(user?.studentId),
-    );
-  }, [students, user]);
-
-  // =========================
-  // STUDENT COURSES
-  // =========================
-
-  const studentCourses = useMemo(() => {
-    if (!student) {
-      return [];
-    }
-
-    const studentId = student.studentId || student.id;
-
-    return courses.filter((course) =>
-      (course.students || []).some((id) => String(id) === String(studentId)),
-    );
-  }, [courses, student]);
-
-  // =========================
-  // TEACHER NAME
-  // =========================
-
-  const getTeacherName = (teacherId) => {
-    if (!teacherId) {
-      return "Not Assigned";
-    }
-
-    const teacher = teachers.find(
-      (item) =>
-        String(item.id) === String(teacherId) ||
-        String(item.teacherId) === String(teacherId),
-    );
-
-    return teacher?.name || "Not Assigned";
-  };
-
-  // =========================
-  // STUDENT GRADE
-  // =========================
-
-  const getCourseGrade = (course) => {
-    if (!course.grades || !student) {
-      return "-";
-    }
-
-    const studentId = student.studentId || student.id;
-
-    const grade = course.grades.find(
-      (item) => String(item.studentId) === String(studentId),
-    );
-
-    if (!grade) {
-      return "-";
-    }
-
-    return grade.grade;
-  };
-
-  // =========================
-  // AVERAGE
-  // =========================
-
-  const average = useMemo(() => {
-    if (!student) {
-      return "0.00";
-    }
-
-    const studentId = student.studentId || student.id;
-
-    const grades = [];
-
-    studentCourses.forEach((course) => {
-      const studentGrade = course.grades?.find(
-        (item) => String(item.studentId) === String(studentId),
-      );
-
-      if (studentGrade && studentGrade.grade !== "") {
-        grades.push(Number(studentGrade.grade));
-      }
-    });
-
-    if (grades.length === 0) {
-      return "0.00";
-    }
-
-    const total = grades.reduce((sum, grade) => sum + grade, 0);
-
-    return (total / grades.length).toFixed(2);
-  }, [studentCourses, student]);
+  const { logout } = useAuth();
+  const {
+    student,
+    studentCourses,
+    average,
+    exams,
+    getCourseGrade,
+    getTeacherName,
+  } = useStudentPortalData();
 
   // =========================
   // LOGOUT
@@ -225,10 +129,7 @@ function StudentPortalPage() {
             <span>Exams</span>
 
             <strong>
-              {studentCourses.reduce(
-                (total, course) => total + (course.exams?.length || 0),
-                0,
-              )}
+              {exams.length}
             </strong>
           </div>
 
@@ -261,8 +162,7 @@ function StudentPortalPage() {
           {studentCourses.length > 0 ? (
             <div className="student-courses-grid">
               {studentCourses.map((course) => {
-                const grade = getCourseGrade(course);
-
+                const grade = getCourseGrade(course) ?? "-";
                 return (
                   <article className="student-course-card" key={course.id}>
                     <div className="student-course-top">
@@ -334,37 +234,37 @@ function StudentPortalPage() {
         ====================== */}
 
         <section className="student-portal-menu">
-          <div className="student-menu-card">
+          <button className="student-menu-card" type="button" onClick={() => navigate("/student-portal/grades")}>
             <div>📊</div>
 
             <h3>Grades</h3>
 
             <p>View your course grades and academic results.</p>
-          </div>
+          </button>
 
-          <div className="student-menu-card">
+          <button className="student-menu-card" type="button" onClick={() => navigate("/student-portal/exams")}>
             <div>📝</div>
 
             <h3>Exams</h3>
 
             <p>View upcoming exams and exam information.</p>
-          </div>
+          </button>
 
-          <div className="student-menu-card">
+          <button className="student-menu-card" type="button" onClick={() => navigate("/student-portal/schedule")}>
             <div>📅</div>
 
             <h3>Schedule</h3>
 
             <p>View your weekly course schedule.</p>
-          </div>
+          </button>
 
-          <div className="student-menu-card">
+          <button className="student-menu-card" type="button" onClick={() => navigate("/student-portal/announcements")}>
             <div>📢</div>
 
             <h3>Announcements</h3>
 
             <p>View announcements from your teachers.</p>
-          </div>
+          </button>
         </section>
       </main>
     </div>

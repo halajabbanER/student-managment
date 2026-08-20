@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 
 import useStudents from "../hooks/useStudents";
+import useAuth from "../hooks/useAuth";
 
 import "./StudentDocumentPage.css";
 
@@ -8,12 +9,22 @@ function StudentDocumentPage() {
   const { id } = useParams();
 
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { getStudent } = useStudents();
 
   const student = getStudent(id);
 
   const issueDate = new Date().toLocaleDateString("tr-TR");
+
+  const handleBack = () => {
+    if (user?.role === "student") {
+      navigate("/student-portal");
+      return;
+    }
+
+    navigate(`/student/${student?.id || id}`);
+  };
 
   // =========================
   // STUDENT NOT FOUND
@@ -25,7 +36,7 @@ function StudentDocumentPage() {
         <div className="document-not-found">
           <h2>Student not found</h2>
 
-          <button type="button" onClick={() => navigate("/academic/students")}>
+          <button type="button" onClick={handleBack}>
             Back to Students
           </button>
         </div>
@@ -63,7 +74,7 @@ function StudentDocumentPage() {
         <button
           type="button"
           className="document-back-btn"
-          onClick={() => navigate(`/student/${student.id}`)}
+          onClick={handleBack}
         >
           ← Back
         </button>

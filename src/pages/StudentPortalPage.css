@@ -405,6 +405,8 @@
 }
 
 .student-menu-card {
+  width: 100%;
+
   padding: 20px;
 
   background: #ffffff;
@@ -414,6 +416,12 @@
   border-radius: 14px;
 
   cursor: pointer;
+
+  color: inherit;
+
+  font: inherit;
+
+  text-align: left;
 
   transition: 0.3s;
 }

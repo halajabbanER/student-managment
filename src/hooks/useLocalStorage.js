@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function useLocalStorage(key, initialValue) {
   const [storedValue, setStoredValue] = useState(() => {
@@ -21,6 +21,11 @@ function useLocalStorage(key, initialValue) {
           value instanceof Function ? value(prevValue) : value;
 
         localStorage.setItem(key, JSON.stringify(valueToStore));
+        window.dispatchEvent(
+          new CustomEvent("local-storage-change", {
+            detail: { key, value: valueToStore },
+          }),
+        );
 
         return valueToStore;
       });
@@ -28,6 +33,20 @@ function useLocalStorage(key, initialValue) {
       console.error("LocalStorage Error:", error);
     }
   };
+
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.detail?.key === key) {
+        setStoredValue(event.detail.value);
+      }
+    };
+
+    window.addEventListener("local-storage-change", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("local-storage-change", handleStorageChange);
+    };
+  }, [key]);
 
   return [storedValue, setValue];
 }

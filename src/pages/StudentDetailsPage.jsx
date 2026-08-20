@@ -27,6 +27,7 @@ function StudentDetailsPage() {
               return;
             }
 
+            
             navigate("/students");
           }}
         >

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import useAuth from "../hooks/useAuth";
@@ -62,8 +62,11 @@ function AcademicPortalPage() {
       .toLowerCase()
       .replace(/[^a-z0-9]/g, "");
 
-  const departmentMatchesTeacher = (departmentName, departmentCode) => {
-    const teacherKey = normalizeText(teacherDepartment);
+  const departmentMatchesTeacher = useCallback((departmentName, departmentCode) => {
+    const teacherKey = String(teacherDepartment || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
 
     if (!teacherKey) {
       return false;
@@ -84,7 +87,7 @@ function AcademicPortalPage() {
       teacherKey.includes(codeKey) ||
       codeKey.includes(teacherKey)
     );
-  };
+  }, [teacherDepartment]);
 
   const teacherCourses = useMemo(() => {
     if (!academicProfile && !teacherDepartment) {
@@ -166,7 +169,14 @@ function AcademicPortalPage() {
         matchingCourses.map((course) => [String(course.id), course]),
       ).values(),
     ];
-  }, [academicProfile, courses, teacherDepartment, teachers, user]);
+  }, [
+    academicProfile,
+    courses,
+    departmentMatchesTeacher,
+    teacherDepartment,
+    teachers,
+    user,
+  ]);
 
   const getCourseStudents = (course) => {
     const enrolledIds = course.students || [];

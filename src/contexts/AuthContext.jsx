@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 
 import AuthContext from "./AuthContext.js";
+import {
+  DEFAULT_STUDENT_COURSES,
+  DEFAULT_STUDENT_ID,
+} from "../data/defaultStudentCourses";
 
 function readList(key) {
   try {
@@ -13,6 +17,11 @@ function readList(key) {
 
 function writeList(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
+  window.dispatchEvent(
+    new CustomEvent("local-storage-change", {
+      detail: { key, value },
+    }),
+  );
 }
 
 function normalizeRole(user) {
@@ -52,7 +61,7 @@ const DEFAULT_ACADEMIC_ACCOUNT = {
 const DEFAULT_STUDENT_ACCOUNT = {
   id: 20032003,
   name: "Demo Student",
-  studentId: "20032003",
+  studentId: DEFAULT_STUDENT_ID,
   email: "student@hala.com",
   password: "Student123",
   department: "Computer Engineering",
@@ -152,6 +161,46 @@ export function AuthProvider({ children }) {
           : [...students, DEFAULT_STUDENT_ACCOUNT];
 
       writeList("students", updatedStudents);
+
+      const courses = readList("courses");
+      const updatedCourses = [...courses];
+
+      DEFAULT_STUDENT_COURSES.forEach((defaultCourse) => {
+        const existingIndex = updatedCourses.findIndex(
+          (course) => course.code === defaultCourse.code,
+        );
+
+        if (existingIndex < 0) {
+          updatedCourses.push(defaultCourse);
+          return;
+        }
+
+        const existingCourse = updatedCourses[existingIndex];
+        const isEnrolled = (existingCourse.students || []).some(
+          (studentId) =>
+            String(studentId) === String(DEFAULT_STUDENT_ACCOUNT.studentId),
+        );
+        const hasGrade = (existingCourse.grades || []).some(
+          (grade) =>
+            String(grade.studentId) ===
+            String(DEFAULT_STUDENT_ACCOUNT.studentId),
+        );
+
+        updatedCourses[existingIndex] = {
+          ...existingCourse,
+          students: isEnrolled
+            ? existingCourse.students
+            : [
+                ...(existingCourse.students || []),
+                DEFAULT_STUDENT_ACCOUNT.studentId,
+              ],
+          grades: hasGrade
+            ? existingCourse.grades
+            : [...(existingCourse.grades || []), ...defaultCourse.grades],
+        };
+      });
+
+      writeList("courses", updatedCourses);
     } catch (error) {
       console.error("Initialize Users Error:", error);
     }

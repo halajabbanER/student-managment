@@ -111,7 +111,7 @@ function AcademicCourseQuizzesPage() {
           normalizeText(teacherDepartment),
         )
       );
-    } catch (error) {
+    } catch {
       return false;
     }
   };
@@ -123,7 +123,7 @@ function AcademicCourseQuizzesPage() {
   const [draftScores, setDraftScores] = useState({});
   const [error, setError] = useState("");
 
-  const quizzes = course?.quizzes || [];
+  const quizzes = useMemo(() => course?.quizzes || [], [course]);
 
   const courseStudents = useMemo(() => {
     if (!course) {

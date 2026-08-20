@@ -60,7 +60,7 @@ function useCourses() {
     (id, updatedData) => {
       const duplicateCode = courses.some(
         (course) =>
-          Number(course.id) !== Number(id) &&
+          String(course.id) !== String(id) &&
           course.code.toLowerCase() === updatedData.code.trim().toLowerCase(),
       );
 
@@ -73,7 +73,7 @@ function useCourses() {
 
       setCourses((prevCourses) =>
         prevCourses.map((course) =>
-          Number(course.id) === Number(id)
+          String(course.id) === String(id)
             ? {
                 ...course,
                 ...updatedData,
@@ -114,7 +114,7 @@ function useCourses() {
   const deleteCourse = useCallback(
     (id) => {
       setCourses((prevCourses) =>
-        prevCourses.filter((course) => Number(course.id) !== Number(id)),
+        prevCourses.filter((course) => String(course.id) !== String(id)),
       );
 
       return {
@@ -126,7 +126,7 @@ function useCourses() {
 
   const getCourse = useCallback(
     (id) => {
-      return courses.find((course) => Number(course.id) === Number(id));
+      return courses.find((course) => String(course.id) === String(id));
     },
     [courses],
   );
@@ -134,7 +134,7 @@ function useCourses() {
   const enrollStudent = useCallback(
     (courseId, studentId) => {
       const course = courses.find(
-        (item) => Number(item.id) === Number(courseId),
+        (item) => String(item.id) === String(courseId),
       );
 
       if (!course) {
@@ -157,7 +157,7 @@ function useCourses() {
 
       setCourses((prevCourses) =>
         prevCourses.map((item) =>
-          Number(item.id) === Number(courseId)
+          String(item.id) === String(courseId)
             ? {
                 ...item,
                 students: [...(item.students || []), studentId],
@@ -177,7 +177,7 @@ function useCourses() {
     (courseId, studentId) => {
       setCourses((prevCourses) =>
         prevCourses.map((course) =>
-          Number(course.id) === Number(courseId)
+          String(course.id) === String(courseId)
             ? {
                 ...course,
                 students: (course.students || []).filter(
@@ -199,7 +199,7 @@ function useCourses() {
     (courseId, studentIds) => {
       setCourses((prevCourses) =>
         prevCourses.map((course) =>
-          Number(course.id) === Number(courseId)
+          String(course.id) === String(courseId)
             ? {
                 ...course,
                 students: studentIds,

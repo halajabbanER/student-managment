@@ -26,6 +26,7 @@ import CourseEnrollmentPage from "./pages/CourseEnrollmentPage";
 /* Student */
 import StudentPortalPage from "./pages/StudentPortalPage";
 import StudentDocumentPage from "./pages/StudentDocumentPage";
+import StudentAcademicPage from "./pages/StudentAcademicPage";
 /* Academic Portal */
 import AcademicPortalPage from "./pages/AcademicPortalPage";
 import AcademicCourseStudentsPage from "./pages/AcademicCourseStudentsPage";
@@ -71,6 +72,14 @@ function App() {
             element={
               <RoleRoute allowedRoles={["admin", "academic", "student"]}>
                 <StudentDocumentPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/student-portal/:section"
+            element={
+              <RoleRoute allowedRoles={["student"]}>
+                <StudentAcademicPage />
               </RoleRoute>
             }
           />

@@ -2,14 +2,18 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import useStudents from "../hooks/useStudents";
+import useAuth from "../hooks/useAuth";
 
 import "./StudentFormPage.css";
 
 function StudentFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { getStudent, updateStudent, loading } = useStudents();
+  const studentsPath =
+    user?.role === "academic" ? "/academic/students" : "/students";
 
   const currentStudent = getStudent(id);
 
@@ -28,7 +32,7 @@ function StudentFormPage() {
       <div className="student-form-page">
         <h2>Student not found</h2>
 
-        <button className="cancel-btn" onClick={() => navigate("/students")}>
+        <button className="cancel-btn" onClick={() => navigate(studentsPath)}>
           Back to Students
         </button>
       </div>
@@ -90,7 +94,7 @@ function StudentFormPage() {
       return;
     }
 
-    const result = await updateStudent(Number(id), {
+    const result = await updateStudent(id, {
       name: formData.name.trim(),
       email: formData.email.trim(),
       department: formData.department,
@@ -105,7 +109,7 @@ function StudentFormPage() {
 
     alert("Student updated successfully!");
 
-    navigate("/students");
+    navigate(studentsPath);
   };
 
   return (
@@ -226,7 +230,7 @@ function StudentFormPage() {
           <button
             type="button"
             className="cancel-btn"
-            onClick={() => navigate("/students")}
+            onClick={() => navigate(studentsPath)}
             disabled={loading}
           >
             Cancel

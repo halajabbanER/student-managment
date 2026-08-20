@@ -100,7 +100,7 @@ function AcademicCourseStudentsPage() {
     const departments = (() => {
       try {
         return JSON.parse(localStorage.getItem("departments") || "[]");
-      } catch (error) {
+      } catch {
         return [];
       }
     })();

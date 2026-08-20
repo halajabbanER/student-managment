@@ -342,6 +342,8 @@
 }
 
 .course-management-card {
+  min-width: 0;
+
   padding: 22px;
 
   display: flex;
@@ -467,6 +469,8 @@
   color: #111827;
 
   font-size: 20px;
+
+  overflow-wrap: anywhere;
 }
 
 .course-information {
@@ -487,6 +491,8 @@
   color: #6b7280;
 
   font-size: 13px;
+
+  min-width: 0;
 }
 
 .course-information strong {
@@ -495,6 +501,8 @@
 
 .course-information span {
   text-align: right;
+
+  overflow-wrap: anywhere;
 }
 
 .course-card-description {
@@ -520,7 +528,9 @@
 
   padding-top: 15px;
 
-  display: flex;
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 
   gap: 8px;
 
@@ -528,9 +538,9 @@
 }
 
 .course-card-actions button {
-  flex: 1;
-
   padding: 8px;
+
+  min-width: 0;
 
   border: none;
 
@@ -678,14 +688,14 @@ body.dark-mode
    RESPONSIVE
 ========================= */
 
-@media (max-width: 1000px) {
+@media (max-width: 1180px) {
   .courses-management-grid {
     grid-template-columns:
       repeat(2, 1fr);
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 780px) {
   .academic-courses-page {
     padding: 20px 15px;
   }

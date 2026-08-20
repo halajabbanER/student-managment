@@ -102,7 +102,7 @@ function AcademicCourseExamsPage() {
           normalizeText(teacherDepartment),
         )
       );
-    } catch (error) {
+    } catch {
       return false;
     }
   };
